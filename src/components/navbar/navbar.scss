@@ -1,7 +1,7 @@
 $title-bg-color-start: #f5f5f5;
 $title-bg-color-end: #bfbfbf;
 @mixin bg-gradient($start: $title-bg-color-start, $end: $title-bg-color-end) {
-  background-image: linear-gradient(to right, $start 0%, $end 100%);
+  background-image: linear-gradient(to right, $start 0%, $end 50%, $start 100%);
 }
 
 .App header {
@@ -13,11 +13,9 @@ $title-bg-color-end: #bfbfbf;
   align-items: center;
   padding: 0 2em;
   height: 6em;
-  @include bg-gradient();
+  // @include bg-gradient();
+  background-color: $title-bg-color-start;
 
-  h1 {
-    margin: 0;
-  }
   .ant-radio-group {
     box-shadow: 1px 1px 2px #bfbfbf;
   }
