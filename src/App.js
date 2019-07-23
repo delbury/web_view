@@ -6,6 +6,7 @@ import PageHome from './pages/home';
 import PageImages from './pages/images';
 import PageVideos from './pages/videos';
 import { enmuCreater } from './libs/util';
+import { WingBlank } from 'antd-mobile';
 
 const PAGE_ROUTERS = enmuCreater([
   '/home',
@@ -36,12 +37,14 @@ class App extends Component {
           currentPage={currentPage}
           changePage={this.changePage}
         ></NavBar>
-        <Switch>
-          <Route exact path={PAGE_ROUTERS[0]} component={PageHome}></Route>
-          <Route exact path={PAGE_ROUTERS[1]} component={PageImages}></Route>
-          <Route exact path={PAGE_ROUTERS[2]} component={PageVideos}></Route>
-          <Redirect to="/home"></Redirect>
-        </Switch>
+        <WingBlank>
+          <Switch>
+            <Route exact path={PAGE_ROUTERS[0]} component={PageHome}></Route>
+            <Route exact path={PAGE_ROUTERS[1]} component={PageImages}></Route>
+            <Route exact path={PAGE_ROUTERS[2]} component={PageVideos}></Route>
+            <Redirect to="/home"></Redirect>
+          </Switch>
+        </WingBlank>
       </div>
     );
   }

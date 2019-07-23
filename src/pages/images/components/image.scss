@@ -1,0 +1,28 @@
+@mixin object-img() {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  background-color: #000;
+}
+
+.imgbox {
+  width: inherit;
+  height: inherit;
+  img {
+    @include object-img();
+  }
+}
+
+.imageview {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #000;
+  color: #fff;
+  img {
+    @include object-img();
+  }
+}
