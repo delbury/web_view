@@ -5,21 +5,28 @@ import NavBar from './components/navbar';
 import PageHome from './pages/home';
 import PageImages from './pages/images';
 import PageVideos from './pages/videos';
+import { enmuCreater } from './libs/util';
 
+const PAGE_ROUTERS = enmuCreater([
+  '/home',
+  '/images',
+  '/videos'
+]);
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentPage: '/home'
+      currentPage: 0
     };
   }
   componentWillMount() {
     this.setState({
-      currentPage: this.props.location.pathname
+      currentPage: PAGE_ROUTERS[this.props.location.pathname]
     });
   }
-  changePage = (page) => {
-    this.setState({ currentPage: page });
+  changePage = (pageIndex) => {
+    this.setState({ currentPage: pageIndex });
+    this.props.history.push(PAGE_ROUTERS[pageIndex]);
   }
   render() {
     const currentPage = this.state.currentPage;
@@ -30,9 +37,9 @@ class App extends Component {
           changePage={this.changePage}
         ></NavBar>
         <Switch>
-          <Route exact path="/home" component={PageHome}></Route>
-          <Route exact path="/images" component={PageImages}></Route>
-          <Route exact path="/videos" component={PageVideos}></Route>
+          <Route exact path={PAGE_ROUTERS[0]} component={PageHome}></Route>
+          <Route exact path={PAGE_ROUTERS[1]} component={PageImages}></Route>
+          <Route exact path={PAGE_ROUTERS[2]} component={PageVideos}></Route>
           <Redirect to="/home"></Redirect>
         </Switch>
       </div>

@@ -2,7 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
-import 'antd/dist/antd.css';
+// import 'antd/dist/antd.css';
+import 'antd-mobile/dist/antd-mobile.css';
 import { HashRouter } from 'react-router-dom';
 
 ReactDOM.render(<HashRouter><App /></HashRouter>, document.getElementById('root'));

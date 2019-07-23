@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
+import { Flex, WingBlank } from 'antd-mobile';
 
 class PageImages extends Component {
   render() {
     return (
-      <div>Images</div>
+      <WingBlank>
+        <Flex></Flex>
+      </WingBlank>
     );
   }
 }

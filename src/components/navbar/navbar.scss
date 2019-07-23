@@ -4,19 +4,7 @@ $title-bg-color-end: #bfbfbf;
   background-image: linear-gradient(to right, $start 0%, $end 50%, $start 100%);
 }
 
-.App header {
-  text-align: center;
-  overflow: hidden;
-  color: #fff;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 2em;
-  height: 6em;
+.header {
   // @include bg-gradient();
-  background-color: $title-bg-color-start;
-
-  .ant-radio-group {
-    box-shadow: 1px 1px 2px #bfbfbf;
-  }
+  // background-color: $title-bg-color-end;
 }
