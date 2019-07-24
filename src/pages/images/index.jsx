@@ -6,19 +6,19 @@ import ImagesView from './components/imagesView';
 const IMGS = [
   {
     src: './test-sources/1.jpg',
-    title: "1"
+    alt: "1"
   },
   {
     src: './test-sources/2.jpg',
-    title: "2"
+    alt: "2"
   },
   {
     src: './test-sources/3.jpg',
-    title: "3"
+    alt: "3"
   },
   {
     src: './test-sources/4.jpg',
-    title: "4"
+    alt: "4"
   }
 ];
 class PageImages extends Component {

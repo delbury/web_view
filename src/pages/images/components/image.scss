@@ -1,6 +1,17 @@
+.img-normal {
+  max-width: 100vw;
+  max-height: 100vh;
+}
+.img-span {
+  // max-width: 100vh;
+  // max-height: 100vw;
+  // transform: rotate(90deg);
+  max-width: 100vw;
+  max-height: 100vh;
+  transform: rotate(90deg);
+}
+
 @mixin object-img() {
-  width: 100%;
-  height: 100%;
   object-fit: contain;
   object-position: center;
   background-color: #000;
@@ -10,6 +21,8 @@
   width: inherit;
   height: inherit;
   img {
+    width: inherit;
+    height: inherit;
     @include object-img();
   }
 }
@@ -23,6 +36,6 @@
   background-color: #000;
   color: #fff;
   img {
-    @include object-img();
+    // @include object-img();
   }
 }
