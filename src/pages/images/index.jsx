@@ -3,7 +3,7 @@ import { Grid } from 'antd-mobile';
 import Image from './components/image'
 import ImagesView from './components/imagesView';
 
-const IMGS = [
+const imgs = [
   {
     src: './test-sources/1.jpg',
     alt: "1"
@@ -21,6 +21,7 @@ const IMGS = [
     alt: "4"
   }
 ];
+const IMGS = Array(40).fill(imgs).flat();
 class PageImages extends Component {
   constructor() {
     super();
@@ -58,17 +59,20 @@ class PageImages extends Component {
     const IMGS = this.state.images;
     return (
       !this.state.showView ? (
-        <Grid
-          data={IMGS}
-          renderItem={(item, index) => 
-            <Image
-              img={item}
-              onClick={() => this.handleImageClick(index)}
-            />
-          }
-          columnNum={2}
-        >
-        </Grid>
+        <div>
+          <Grid
+            className="imagebox"
+            data={IMGS}
+            renderItem={(item, index) => 
+              <Image
+                img={item}
+                onClick={() => this.handleImageClick(index)}
+              />
+            }
+            columnNum={2}
+          >
+          </Grid>
+        </div>
       ) : (
         <ImagesView
           imgs={IMGS}

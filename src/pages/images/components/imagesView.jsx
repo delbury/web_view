@@ -66,6 +66,7 @@ export default class ImagesView extends Component {
     // 前一页后一页
     if(this.state.switchable) {
       this.hammer.on('panstart', ev => {
+        if(this.state.frozen) return;
         const { deltaX: ox } = ev;
         const fnMove = ev => {
           const { deltaX } = ev;

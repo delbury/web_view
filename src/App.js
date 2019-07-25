@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './styles/home.scss';
+import './styles/index.scss';
 import { Route, Switch, Redirect, withRouter } from 'react-router-dom';
 import NavBar from './components/navbar';
 import PageHome from './pages/home';
@@ -7,6 +7,7 @@ import PageImages from './pages/images';
 import PageVideos from './pages/videos';
 import { enmuCreater } from './libs/util';
 import { WingBlank } from 'antd-mobile';
+import { BackTop } from 'antd';
 
 const PAGE_ROUTERS = enmuCreater([
   '/home',
@@ -33,6 +34,7 @@ class App extends Component {
     const currentPage = this.state.currentPage;
     return (
       <div className="App">
+        <BackTop/>
         <NavBar
           currentPage={currentPage}
           changePage={this.changePage}
