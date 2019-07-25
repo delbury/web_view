@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './image.scss';
+import './style/image.scss';
 
 export default class PageImages extends Component {
   render() {

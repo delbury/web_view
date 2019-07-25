@@ -9398,7 +9398,7 @@ react-dev-utils@^9.0.1:
     strip-ansi "5.2.0"
     text-table "0.2.0"
 
-react-dom@^16.8.6:
+react-dom@^16.6.3, react-dom@^16.8.6:
   version "16.8.6"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.8.6.tgz#71d6303f631e8b0097f56165ef608f051ff6e10f"
   integrity sha512-1nL7PIq9LTL3fthPqwkvr2zY7phIPjYrT0jp4HjyEQrEROnw4dG41VVwi/wfoCneoleqrNX7iAD+pXebJZwrwA==
@@ -9502,7 +9502,17 @@ react-tween-state@^0.1.5:
     raf "^3.1.0"
     tween-functions "^1.0.1"
 
-react@^16.8.6:
+react-zmage@^0.8.4:
+  version "0.8.4"
+  resolved "https://registry.yarnpkg.com/react-zmage/-/react-zmage-0.8.4.tgz#86c0385ddd8cd21e66759f200a59c8d2ebc80ef7"
+  integrity sha512-mwi4RgJCsdByT/vj6AKeQFh4Qw/P7Ebt+xjP8G6x420+MuGHtEQ5yUp43oCB0C77s2GRbdRo2vW+4H8w2cIFjw==
+  dependencies:
+    classnames "^2.2.6"
+    prop-types "^15.6.2"
+    react "^16.6.3"
+    react-dom "^16.6.3"
+
+react@^16.6.3, react@^16.8.6:
   version "16.8.6"
   resolved "https://registry.yarnpkg.com/react/-/react-16.8.6.tgz#ad6c3a9614fd3a4e9ef51117f54d888da01f2bbe"
   integrity sha512-pC0uMkhLaHm11ZSJULfOBqV4tIZkx87ZLvbbQYunNixAAvjnC+snJCg0XQXn9VIsttVsbZP/H/ewzgsd5fxKXw==

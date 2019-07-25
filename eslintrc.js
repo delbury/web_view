@@ -4,6 +4,7 @@ module.exports = {
     node: true
   },
   rules: {
-    'no-restricted-globals': 'off'
+    'no-restricted-globals': 'off',
+    'no-unused-vars': 'off'
   }
 };
