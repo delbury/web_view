@@ -15,6 +15,20 @@ function shuffle(array) {
   return array;
 }
 
+function computedResource(ctx, arr) {
+  const pageNum = ctx.query.pageNum || 1;
+  const pageSize = ctx.query.pageSize || 20;
+  const len = arr.length;
+  const start = (pageNum - 1) * pageSize;
+  const end = start + pageSize;
+  return {
+    hasNext: end >= len ? false : true,
+    total: Math.ceil(len / pageSize),
+    data: arr.slice(start, end)
+  };
+}
+
 module.exports = {
-  shuffle
+  shuffle,
+  computedResource
 }

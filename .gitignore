@@ -25,3 +25,4 @@ yarn-error.log*
 /public/test-sources/*
 /server/test-resources/*
 /server/modules/files_info.json
+/server/pd

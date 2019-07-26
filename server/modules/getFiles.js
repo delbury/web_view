@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require('path').posix;
 const fs = require('fs');
 const readline = require('readline');
 const expect = require('chai').expect;
@@ -9,6 +9,8 @@ const fsStat = promisify(fs.stat);
 const fsWriteFile = promisify(fs.writeFile);
 const fsAccess = promisify(fs.access);
 const fsReadFile = promisify(fs.readFile);
+let resourceBaseUrl = '';
+let rootPath = '';
 
 const sources = {
   dirsTree: {
@@ -49,17 +51,26 @@ async function getFiles(baseUrl, tree = sources.dirsTree) {
       // 否则为文件
       const ext = path.extname(item);
       let type = '';
+      
+      const srcobj = {
+        src: path.format({
+          dir: rootPath,
+          base: path.relative(resourceBaseUrl, fullName)
+        }),
+        alt: item
+      };
       if(imageReg.test(ext)) {
         // 图片
         type = 'image';
-        sources.imageList.push(fullName);
+        sources.imageList.push(srcobj);
+        
       } else if(videoReg.test(ext)) {
         // 视频
         type = 'video';
-        sources.videoList.push(fullName);
+        sources.videoList.push(srcobj);
       }
       tree.files.push({
-        src: fullName,
+        ...srcobj,
         type
       });
     }
@@ -76,13 +87,16 @@ async function readInfo(url) {
 }
 
 async function refreshFilesInfo(url) {
+  resourceBaseUrl = url;
   await getFiles(url);
   console.log('------ got files info successfully ! ------');
   await saveInfo(__dirname, sources);
   console.log('------ saved files info successfully ! ------');
 }
 
-async function init(url, { hasInput = true } = { hasInput: true }) {
+// 初始化
+async function init(url, { hasInput = true, host = '/' } = { hasInput: true, host: '/' }) {
+  rootPath = host
   try {
     await fsAccess(path.join(__dirname, FILES_INFO_NAME));
     const kw = hasInput ? (await getInputKeywords()).toLowerCase() : 'n';
