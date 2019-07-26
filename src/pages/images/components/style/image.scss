@@ -27,7 +27,7 @@
   }
 }
 
-.imageview {
+.App .imageview {
   position: fixed;
   left: 0;
   top: 0;
@@ -38,6 +38,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: auto;
+  z-index: 9;
 
   .icon {
     position: absolute;
