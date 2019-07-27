@@ -1,36 +1,26 @@
 import React, { Component } from 'react';
-import { Grid } from 'antd-mobile';
+import { Grid, WhiteSpace } from 'antd-mobile';
 import Image from '../components/image'
 import ImagesView from '../components/imagesView';
 import { getRandomImages } from '../../../api';
+// import { consoleTest } from '../components/js/tool';
 
-// const imgs = [
-//   {
-//     src: './test-sources/1.jpg',
-//     alt: "1"
-//   },
-//   {
-//     src: './test-sources/2.jpg',
-//     alt: "2"
-//   },
-//   {
-//     src: './test-sources/3.jpg',
-//     alt: "3"
-//   },
-//   {
-//     src: './test-sources/4.jpg',
-//     alt: "4"
-//   }
-// ];
-// const IMGS = Array(40).fill(imgs).flat();
+
 class RandomPageImages extends Component {
   constructor() {
     super();
     this.state = {
       showView: false,
       index: 0,
-      images: []
+      images: [],
+      loading: false
     };
+    this.pageInfo = {
+      pageSize: 10,
+      pageNum: 1,
+      hasNext: true,
+      total: 0,
+    }
   }
   handleImagesViewClick = (ev) => {
     this.setState({ showView: false });
@@ -41,24 +31,65 @@ class RandomPageImages extends Component {
       index
     });
   }
-  handleChangeImage = ev => {
+  handleChangeImage = async ev => {
     let index = this.state.index;
     if(ev === 'prev') {
       // 上一页
       this.setState({
-        index: index === 0 ? this.state.images.length - 1 : index - 1
+        index: index !== 0 ? index - 1 : 0
       })
     } else {
       // 下一页
-      this.setState({
-        index: index === this.state.images.length - 1 ? 0 : index + 1
-      })
+      if(index === this.state.images.length - 1) {
+        if(!this.pageInfo.hasNext || this.state.loading) {
+          return;
+        } else {
+          await this.fetchData();
+          this.setState({ index: index + 1 });
+        }
+      } else {
+        this.setState({ index: index + 1 });
+      }
+    }
+  }
+  handleRefresh = () => {
+    if(this.pageInfo.hasNext) {
+      this.fetchData();
     }
   }
 
+  fetchData = async () => {
+    if(this.state.loading || !this.pageInfo.hasNext) return;
+    this.setState({ loading: true });
+    const res = (await getRandomImages({
+      pageSize: this.pageInfo.pageSize,
+      pageNum: this.pageInfo.pageNum++
+    })).data;
+    this.setState((state) => ({
+      images: state.images.concat(res.data)
+    }));
+    this.pageInfo.hasNext = res.hasNext;
+    this.pageInfo.total = res.total;
+    this.setState({ loading: false });
+  }
+
   async componentWillMount() {
-    const res = await getRandomImages();
-    this.setState({ images: res.data.data });
+    this.fetchData();
+  }
+
+  handleScroll = ev => {
+    const { scrollHeight, clientHeight } = document.documentElement;
+    const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+    if((clientHeight + scrollTop) - scrollHeight > -20) {
+      this.fetchData();
+    }
+  }
+
+  componentDidMount() {
+    window.addEventListener('scroll', this.handleScroll);
+  }
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this.handleScroll);
   }
 
   render() {
@@ -87,6 +118,7 @@ class RandomPageImages extends Component {
             ></ImagesView>
           ) : ''
         }
+      <WhiteSpace size="lg" />
     </div>
     );
   }

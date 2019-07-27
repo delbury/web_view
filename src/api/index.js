@@ -6,3 +6,9 @@ export const getRandomImages = async (ars) => {
     params: ars
   });
 };
+
+export const getTreeImages = async (ars) => {
+  return await axios.get(HOST + '/images/tree', {
+    params: ars
+  });
+};

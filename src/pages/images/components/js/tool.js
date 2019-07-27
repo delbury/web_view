@@ -16,11 +16,10 @@ export function preventPullToRefresh(element) {
     });
 };
 
+// const URL = 'http://192.168.191.1:4000';
+const URL = 'http://192.168.0.104:4000';
 export function consoleTest(value) {
-  const fd = new FormData();
-  fd.append('value', value);
-  window.fetch('http://192.168.191.1:4000/test?value=' + value, {
-    method: 'post',
-    body: fd
+  window.fetch(URL + '/test?value=' + value, {
+    method: 'get',
   });
 }

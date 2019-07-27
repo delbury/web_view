@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './styles/index.scss';
-import { Route, Switch, Redirect, withRouter } from 'react-router-dom';
+import { Route, Redirect, withRouter } from 'react-router-dom';
 import NavBar from './components/navbar';
 import PageHome from './pages/home';
 import PageImages from './pages/images';
@@ -8,6 +8,8 @@ import PageVideos from './pages/videos';
 import { enmuCreater } from './libs/util';
 import { WingBlank } from 'antd-mobile';
 import { BackTop } from 'antd';
+import CacheRoute, { CacheSwitch } from 'react-router-cache-route';
+import { connect } from "react-redux";
 
 const PAGE_ROUTERS = enmuCreater([
   '/home',
@@ -40,16 +42,21 @@ class App extends Component {
           changePage={this.changePage}
         ></NavBar>
         <WingBlank>
-          <Switch>
+          <CacheSwitch>
             <Route exact path={PAGE_ROUTERS[0]} component={PageHome}></Route>
-            <Route exact path={PAGE_ROUTERS[1]} component={PageImages}></Route>
-            <Route exact path={PAGE_ROUTERS[2]} component={PageVideos}></Route>
+            <CacheRoute exact path={PAGE_ROUTERS[1]} component={PageImages}></CacheRoute>
+            <CacheRoute exact path={PAGE_ROUTERS[2]} component={PageVideos}></CacheRoute>
             <Redirect to="/home"></Redirect>
-          </Switch>
+          </CacheSwitch>
         </WingBlank>
       </div>
     );
   }
 }
 
+const mapDispatchToProps = {};
+// export default connect(
+//   null,
+//   mapDispatchToProps
+// )(withRouter(App));
 export default withRouter(App);

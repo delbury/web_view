@@ -11,12 +11,14 @@ const fsAccess = promisify(fs.access);
 const fsReadFile = promisify(fs.readFile);
 let resourceBaseUrl = '';
 let rootPath = '';
+let id = 1;
 
 const sources = {
   dirsTree: {
     dirname: '',
     children: [],
-    files: []
+    files: [],
+    id: ''
   },
   imageList: [],
   videoList: []
@@ -29,6 +31,7 @@ const FILES_INFO_NAME = 'files_info.json';
 async function getFiles(baseUrl, tree = sources.dirsTree) {
   const rootDirName = path.basename(baseUrl);
   tree.dirname = rootDirName; // 记录文件夹名称
+  tree.id = id++;
 
   // 获取文件夹下所有文件
   const files = await fsReaddir(baseUrl);

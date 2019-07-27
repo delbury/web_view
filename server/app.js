@@ -42,11 +42,21 @@ const HOST = 'http://192.168.0.104:4000';
       ...tools.computedResource(ctx, randomVideos)
     }
   })
-  .get('/filestree', async ctx => {
+  .get('/tree', async ctx => {
+    const { ids } = ctx.query;
     ctx.body = {
       code: 0,
-      data: dirsTree,
-      msg: 'successed'
+      msg: 'successed',
+      // ...tools.getTree(dirsTree, ids)
+      data: dirsTree
+    }
+  })
+  .get('/test', async ctx => {
+    const { value } = ctx.query;
+    console.log('=====================   ', value);
+    ctx.body = {
+      code: 0,
+      msg: 'successed',
     }
   })
   .all('*', async ctx => {

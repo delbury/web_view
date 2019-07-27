@@ -1,3 +1,4 @@
+const expert = require('chai').expect;
 const cloneDeep = require('lodash').cloneDeep;
 
 function shuffle(array) {
@@ -16,8 +17,8 @@ function shuffle(array) {
 }
 
 function computedResource(ctx, arr) {
-  const pageNum = ctx.query.pageNum || 1;
-  const pageSize = ctx.query.pageSize || 20;
+  const pageNum = Number(ctx.query.pageNum || 1);
+  const pageSize = Number(ctx.query.pageSize || 20);
   const len = arr.length;
   const start = (pageNum - 1) * pageSize;
   const end = start + pageSize;
@@ -28,7 +29,25 @@ function computedResource(ctx, arr) {
   };
 }
 
+function getTree(tree, ids = '1') {
+  expert(tree).not.to.be.equal(undefined);
+  const arr = ids.split(',');
+  let id = '1';
+  let subTree = tree;
+  while(id = arr.shift()) {
+    tree.children.forEach(item => {
+      if(item.id == id) {
+        subTree = item;
+      }
+    });
+  }
+  return {
+    data: subTree
+  }
+}
+
 module.exports = {
   shuffle,
-  computedResource
+  computedResource,
+  getTree
 }
