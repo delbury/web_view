@@ -47,6 +47,10 @@ function ComputedAccordion(props) {
 }
 
 class ClassifyPageImages extends Component {
+  constructor() {
+    super();
+  }
+
   handleClickDir = ev => {
     this.props.setFolder({ data: ev });
     if(ev.files.length !== 0) {

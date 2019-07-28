@@ -9,7 +9,8 @@ import { enmuCreater } from './libs/util';
 import { WingBlank } from 'antd-mobile';
 import { BackTop } from 'antd';
 import CacheRoute, { CacheSwitch } from 'react-router-cache-route';
-import { connect } from "react-redux";
+import { connect } from 'react-redux';
+import { getTreeActionAsync } from './store/action';
 
 const PAGE_ROUTERS = enmuCreater([
   '/home',
@@ -24,6 +25,7 @@ class App extends Component {
     };
   }
   componentWillMount() {
+    this.props.getTree();
     this.setState({
       currentPage: PAGE_ROUTERS[this.props.location.pathname]
     });
@@ -54,9 +56,12 @@ class App extends Component {
   }
 }
 
-const mapDispatchToProps = {};
-// export default connect(
-//   null,
-//   mapDispatchToProps
-// )(withRouter(App));
-export default withRouter(App);
+const mapStateToProps = (state) => ({
+  tree: state.tree
+});
+const mapDispatchToProps = { getTree: getTreeActionAsync };
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withRouter(App));
+// export default withRouter(App);

@@ -7,8 +7,14 @@ export const getRandomImages = async (ars) => {
   });
 };
 
-export const getTreeImages = async (ars) => {
-  return await axios.get(HOST + '/images/tree', {
+export const getRandomVideos = async (ars) => {
+  return await axios.get(HOST + '/videos/random', {
+    params: ars
+  });
+};
+
+export const getTree = async (ars) => {
+  return await axios.get(HOST + '/tree', {
     params: ars
   });
 };

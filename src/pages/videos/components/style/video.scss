@@ -1,0 +1,15 @@
+@mixin object-img() {
+  object-fit: contain;
+  object-position: center;
+  background-color: #000;
+}
+
+.videobox {
+  width: inherit;
+  height: inherit;
+  video {
+    width: inherit;
+    height: inherit;
+    @include object-img();
+  }
+}

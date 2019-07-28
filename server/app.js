@@ -2,8 +2,11 @@ const Koa = require('koa');
 const path = require('path');
 const Router = require('koa-router');
 const static = require('koa-static');
+// const range = require('koa-range');
 const expert = require('chai').expect;
-// const os = require('os');
+const fs = require('fs');
+const promisify= require('util').promisify;
+const fsReadFile = promisify(fs.readFile);
 
 const tools = require('./modules/tools'); // shuffle
 const {
@@ -11,8 +14,7 @@ const {
   sources: { dirsTree, imageList, videoList }
 } = require('./modules/getFiles');
 const HOST = 'http://192.168.0.104:4000';
-// const nw = os.networkInterfaces();
-
+const SOURCE_DIR = path.join(__dirname, '/pd');
 
 // 主体
 (async () => {
@@ -23,7 +25,9 @@ const HOST = 'http://192.168.0.104:4000';
 
   const app = new Koa();
   const router = new Router();
+
   router
+  // 随机图片
   .get('/images/random', async ctx => {
     
     ctx.body = {
@@ -33,6 +37,7 @@ const HOST = 'http://192.168.0.104:4000';
       ...tools.computedResource(ctx, randomImages)
     }
   })
+  // 随机视频
   .get('/videos/random', async ctx => {
     const { pageNum, pageSize } = ctx.query;
     ctx.body = {
@@ -42,14 +47,32 @@ const HOST = 'http://192.168.0.104:4000';
       ...tools.computedResource(ctx, randomVideos)
     }
   })
+  // 文件结构
   .get('/tree', async ctx => {
     const { ids } = ctx.query;
     ctx.body = {
       code: 0,
       msg: 'successed',
       // ...tools.getTree(dirsTree, ids)
-      data: dirsTree
+      data: [dirsTree]
     }
+  })
+  // 播放视频
+  .get('/play/:path', async ctx => {
+    const rspath = ctx.params.path;
+    console.log(rspath);
+    const file = await fsReadFile(path.join(SOURCE_DIR, rspath));
+    // const total = file.length;
+    // ctx.set({
+    //   'Content-Range': `bytes ${0}-${0}/${0}`,
+    //   'Accept-Ranges': 'bytes',
+    //   'Content-Length': 0,
+    //   'Content-Type': 'video/mp4'
+    // });
+
+    ctx.body= {
+      code: 0
+    };
   })
   .get('/test', async ctx => {
     const { value } = ctx.query;
@@ -62,6 +85,8 @@ const HOST = 'http://192.168.0.104:4000';
   .all('*', async ctx => {
     ctx.status = 404;
   });
+
+  app.on('error', err => console.log(err));
 
   app
     .use(static(path.join(__dirname, '/pd')))

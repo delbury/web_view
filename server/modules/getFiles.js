@@ -60,7 +60,11 @@ async function getFiles(baseUrl, tree = sources.dirsTree) {
           dir: rootPath,
           base: path.relative(resourceBaseUrl, fullName)
         }),
-        alt: item
+        alt: item,
+        sourcrPath: path.format({
+          dir: rootPath,
+          base: 'play/' + encodeURIComponent(path.relative(resourceBaseUrl, fullName))
+        })
       };
       if(imageReg.test(ext)) {
         // 图片

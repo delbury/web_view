@@ -1,18 +1,18 @@
 import React, { Component } from 'react';
 import { Grid, WhiteSpace } from 'antd-mobile';
-import Image from '../components/image'
-import ImagesView from '../components/imagesView';
-import { getRandomImages } from '../../../api';
+import Video from '../components/video'
+import VideosView from '../components/videosView';
+import { getRandomVideos } from '../../../api';
 // import { consoleTest } from '../components/js/tool';
 
 
-class RandomPageImages extends Component {
+class RandomPageVideos extends Component {
   constructor() {
     super();
     this.state = {
       showView: false,
       index: 0,
-      images: [],
+      videos: [],
       loading: false
     };
     this.pageInfo = {
@@ -22,16 +22,16 @@ class RandomPageImages extends Component {
       total: 0,
     }
   }
-  handleImagesViewClick = (ev) => {
+  handleVideosViewClick = (ev) => {
     this.setState({ showView: false });
   }
-  handleImageClick = (index) => {
+  handleVideoClick = (index) => {
     this.setState({
       showView: true,
       index
     });
   }
-  handleChangeImage = async ev => {
+  handleChangeVideo = async ev => {
     const index = this.state.index;
     if(ev === 'prev') {
       // 上一页
@@ -40,7 +40,7 @@ class RandomPageImages extends Component {
       })
     } else {
       // 下一页
-      if(index === this.state.images.length - 1) {
+      if(index === this.state.videos.length - 1) {
         if(!this.pageInfo.hasNext || this.state.loading) {
           return;
         } else {
@@ -61,12 +61,12 @@ class RandomPageImages extends Component {
   fetchData = async () => {
     if(this.state.loading || !this.pageInfo.hasNext) return;
     this.setState({ loading: true });
-    const res = (await getRandomImages({
+    const res = (await getRandomVideos({
       pageSize: this.pageInfo.pageSize,
       pageNum: this.pageInfo.pageNum++
     })).data;
     this.setState((state) => ({
-      images: state.images.concat(res.data)
+      videos: state.videos.concat(res.data)
     }));
     this.pageInfo.hasNext = res.hasNext;
     this.pageInfo.total = res.total;
@@ -90,35 +90,35 @@ class RandomPageImages extends Component {
   }
 
   render() {
-    const IMGS = this.state.images;
+    const VIDEOS = this.state.videos;
     return (
       <div>
         <Grid
-          className="imagebox"
-          data={IMGS}
+          className="videobox"
+          data={VIDEOS}
           renderItem={(item, index) => 
-            <Image
-              img={item}
-              onClick={() => this.handleImageClick(index)}
+            <Video
+              video={item}
+              onClick={() => this.handleVideoClick(index)}
             />
           }
           columnNum={2}
         >
         </Grid>
-        {
+        {/* {
           this.state.showView ? (
-            <ImagesView
+            <VideosView
               imgs={IMGS}
-              onClick={this.handleImagesViewClick}
+              onClick={this.handleVideosViewClick}
               index={this.state.index}
-              onChangeImage={this.handleChangeImage}
-            ></ImagesView>
+              onChangeImage={this.handleChangeVideo}
+            ></VideosView>
           ) : ''
-        }
+        } */}
       <WhiteSpace size="lg" />
     </div>
     );
   }
 }
 
-export default RandomPageImages;
+export default RandomPageVideos;

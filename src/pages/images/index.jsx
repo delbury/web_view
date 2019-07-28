@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Flex, Tabs } from 'antd-mobile';
 import RandomPage from './subpages/randomPage';
+import ClassifyPage from './subpages/classifyPage';
+import FolderPage from './subpages/folderPage';
 
 class PageImageIndex extends Component {
   constructor() {
@@ -9,10 +11,16 @@ class PageImageIndex extends Component {
       tabs: [
         { title: 'Random' },
         { title: 'Classify' },
-        { title: 'Collection' }
-      ]
+        { title: 'Folder' }
+      ],
+      currentTabIndex: 0
     };
   }
+
+  handleChangePage = ev => {
+    this.setState({ currentTabIndex: ev });
+  }
+
   render() {
     return (
       <Flex>
@@ -21,11 +29,13 @@ class PageImageIndex extends Component {
           tabBarBackgroundColor="rgba(0, 0, 0, 0)"
           tabBarTextStyle={{ fontSize: '0.8em' }}
           animated={false}
-          swipeable={false}
+          swipeable={true}
+          page={this.state.currentTabIndex}
+          onChange={(tab, index) => this.setState({ currentTabIndex: index })}
         >
           <RandomPage></RandomPage>
-          <div>1</div>
-          <div>2</div>
+          <ClassifyPage onChangePage={this.handleChangePage}></ClassifyPage>
+          <FolderPage></FolderPage>
         </Tabs>
       </Flex>
     );
