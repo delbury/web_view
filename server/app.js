@@ -58,21 +58,19 @@ const SOURCE_DIR = path.join(__dirname, '/pd');
     }
   })
   // 播放视频
-  .get('/play/:path', async ctx => {
+  .get('/play/:path', async (ctx, next) => {
     const rspath = ctx.params.path;
     console.log(rspath);
     const file = await fsReadFile(path.join(SOURCE_DIR, rspath));
-    // const total = file.length;
-    // ctx.set({
-    //   'Content-Range': `bytes ${0}-${0}/${0}`,
-    //   'Accept-Ranges': 'bytes',
-    //   'Content-Length': 0,
-    //   'Content-Type': 'video/mp4'
-    // });
+    const total = file.length;
+    ctx.set({
+      'Content-Range': `bytes ${0}-${total - 1}/${total}`,
+      'Accept-Ranges': 'bytes',
+      'Content-Length': total,
+      'Content-Type': 'video/mp4'
+    });
 
-    ctx.body= {
-      code: 0
-    };
+    ctx.body = file;
   })
   .get('/test', async ctx => {
     const { value } = ctx.query;
@@ -92,7 +90,7 @@ const SOURCE_DIR = path.join(__dirname, '/pd');
     .use(static(path.join(__dirname, '/pd')))
     .use(async (ctx, next) => {
       ctx.set('Access-Control-Allow-Origin', "*");
-      next();
+      await next();
     })
     .use(router.routes())
     .use(router.allowedMethods());
