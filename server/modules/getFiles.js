@@ -58,12 +58,12 @@ async function getFiles(baseUrl, tree = sources.dirsTree) {
       const srcobj = {
         src: path.format({
           dir: rootPath,
-          base: path.relative(resourceBaseUrl, fullName)
+          base: '/' + path.relative(resourceBaseUrl, fullName)
         }),
         alt: item,
         sourcrPath: path.format({
           dir: rootPath,
-          base: 'play/' + encodeURIComponent(path.relative(resourceBaseUrl, fullName))
+          base: '/play/' + encodeURIComponent(path.relative(resourceBaseUrl, fullName))
         })
       };
       if(imageReg.test(ext)) {

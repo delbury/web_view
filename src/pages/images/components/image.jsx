@@ -7,7 +7,7 @@ export default class PageImages extends Component {
     return (
       <div className="imgbox">
         <img
-          src={img.src}
+          src={window.API_BASE_URL + img.src}
           alt={img.alt}
           onClick={this.props.onClick}
         />

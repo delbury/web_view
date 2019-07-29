@@ -7,12 +7,13 @@ export default class PageImages extends Component {
     return (
       <div className="videobox">
         <video
-          preload="meta"
-        >
-          <source src={video.sourcrPath} type="video/mp4" />
-          {/* <source src={video.src} type="video/ogg" />
-          <source src={video.src} type="video/webm" /> */}
-        </video>
+          preload="metadata"
+          controls
+          playsInline
+          // poster="/test-sources/1.jpg"
+          src={window.API_BASE_URL + video.sourcrPath}
+          type="video/mp4"
+        ></video>
       </div>
     );
   }

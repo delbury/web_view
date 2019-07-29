@@ -191,7 +191,7 @@ export default class ImagesView extends Component {
         <img
           style={style}
           className="img-normal"
-          src={IMGS[index].src}
+          src={window.API_BASE_URL + IMGS[index].src}
           alt={IMGS[index].alt}
           onClick={this.props.onClick}
           ref="imageview"

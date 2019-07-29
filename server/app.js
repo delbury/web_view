@@ -1,7 +1,7 @@
 const Koa = require('koa');
 const path = require('path');
 const Router = require('koa-router');
-const static = require('koa-static');
+const koaStatic = require('koa-static');
 // const range = require('koa-range');
 const expert = require('chai').expect;
 const fs = require('fs');
@@ -13,7 +13,7 @@ const {
   init,
   sources: { dirsTree, imageList, videoList }
 } = require('./modules/getFiles');
-const HOST = 'http://192.168.0.104:4000';
+const HOST = ''; // 'http://192.168.0.104:4000'
 const SOURCE_DIR = path.join(__dirname, '/pd');
 
 // 主体
@@ -39,7 +39,6 @@ const SOURCE_DIR = path.join(__dirname, '/pd');
   })
   // 随机视频
   .get('/videos/random', async ctx => {
-    const { pageNum, pageSize } = ctx.query;
     ctx.body = {
       code: 0,
       // data: randomVideos,
@@ -49,7 +48,7 @@ const SOURCE_DIR = path.join(__dirname, '/pd');
   })
   // 文件结构
   .get('/tree', async ctx => {
-    const { ids } = ctx.query;
+    // const { ids } = ctx.query;
     ctx.body = {
       code: 0,
       msg: 'successed',
@@ -60,17 +59,30 @@ const SOURCE_DIR = path.join(__dirname, '/pd');
   // 播放视频
   .get('/play/:path', async (ctx, next) => {
     const rspath = ctx.params.path;
-    console.log(rspath);
+    const range = ctx.headers.range;
+
+    console.log('---------------------------------   ' + ctx.headers['x-playback-session-id']);
+    console.log(JSON.stringify(ctx.headers, null, 2));
+
+    const positions = range.replace(/bytes=/, '').split('-');
     const file = await fsReadFile(path.join(SOURCE_DIR, rspath));
     const total = file.length;
-    ctx.set({
-      'Content-Range': `bytes ${0}-${total - 1}/${total}`,
+    const start = Number(positions[0]);
+    const end = Number(positions[1] || (total - 1))
+    const headers = {
+      'Content-Range': `bytes ${start}-${end}/${total}`,
       'Accept-Ranges': 'bytes',
-      'Content-Length': total,
-      'Content-Type': 'video/mp4'
-    });
+      'Content-Length': end - start + 1,
+      'Content-Type': 'video/mp4',
+      // 'Keep-Alive': 'timeout=5, max=100'
+    }
+    ctx.set(headers);
 
-    ctx.body = file;
+    console.log('***************    ');
+    console.log(JSON.stringify(headers, null, 2))
+    console.log('----------------------------------------')
+    ctx.status = 206;
+    ctx.body = file.slice(start, end + 1);
   })
   .get('/test', async ctx => {
     const { value } = ctx.query;
@@ -87,7 +99,7 @@ const SOURCE_DIR = path.join(__dirname, '/pd');
   app.on('error', err => console.log(err));
 
   app
-    .use(static(path.join(__dirname, '/pd')))
+    .use(koaStatic(path.join(__dirname, '/pd')))
     .use(async (ctx, next) => {
       ctx.set('Access-Control-Allow-Origin', "*");
       await next();
