@@ -7,7 +7,8 @@ export default class PageImages extends Component {
     return (
       <div className="videobox">
         <video
-          preload="metadata"
+          // preload="metadata"
+          poster={window.API_BASE_URL + video.posterPath}
           controls
           playsInline
           // poster="/test-sources/1.jpg"

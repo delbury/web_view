@@ -54,17 +54,13 @@ async function getFiles(baseUrl, tree = sources.dirsTree) {
       // 否则为文件
       const ext = path.extname(item);
       let type = '';
-      
+
       const srcobj = {
         src: path.format({
           dir: rootPath,
           base: '/' + path.relative(resourceBaseUrl, fullName)
         }),
-        alt: item,
-        sourcrPath: path.format({
-          dir: rootPath,
-          base: '/play/' + encodeURIComponent(path.relative(resourceBaseUrl, fullName))
-        })
+        alt: item
       };
       if(imageReg.test(ext)) {
         // 图片
@@ -74,7 +70,18 @@ async function getFiles(baseUrl, tree = sources.dirsTree) {
       } else if(videoReg.test(ext)) {
         // 视频
         type = 'video';
-        sources.videoList.push(srcobj);
+        const bp = encodeURIComponent(path.relative(resourceBaseUrl, fullName));
+        sources.videoList.push({
+          ...srcobj,
+          sourcrPath: path.format({
+            dir: rootPath,
+            base: '/play/' + bp
+          }),
+          posterPath: path.format({
+            dir: rootPath,
+            base: '/poster/' + bp
+          })
+        });
       }
       tree.files.push({
         ...srcobj,

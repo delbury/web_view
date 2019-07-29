@@ -7,7 +7,12 @@ const expert = require('chai').expect;
 const fs = require('fs');
 const promisify= require('util').promisify;
 const fsReadFile = promisify(fs.readFile);
+const fsRename = promisify(fs.rename);
+const fsAccess = promisify(fs.access);
 
+const crypto = require('crypto');
+
+const ffmpeg = require('./modules/ffmpeg');
 const tools = require('./modules/tools'); // shuffle
 const {
   init,
@@ -57,12 +62,9 @@ const SOURCE_DIR = path.join(__dirname, '/pd');
     }
   })
   // 播放视频
-  .get('/play/:path', async (ctx, next) => {
-    const rspath = ctx.params.path;
+  .get('/play/:path', async ctx => {
+    const rspath = decodeURIComponent(ctx.params.path);
     const range = ctx.headers.range;
-
-    console.log('---------------------------------   ' + ctx.headers['x-playback-session-id']);
-    console.log(JSON.stringify(ctx.headers, null, 2));
 
     const positions = range.replace(/bytes=/, '').split('-');
     const file = await fsReadFile(path.join(SOURCE_DIR, rspath));
@@ -78,11 +80,59 @@ const SOURCE_DIR = path.join(__dirname, '/pd');
     }
     ctx.set(headers);
 
-    console.log('***************    ');
-    console.log(JSON.stringify(headers, null, 2))
-    console.log('----------------------------------------')
     ctx.status = 206;
     ctx.body = file.slice(start, end + 1);
+  })
+  // .get('/play/:path', async ctx => {
+  //   const rspath = decodeURIComponent(ctx.params.path);
+  //   const range = ctx.headers.range;
+
+  //   console.log('---------------------------------   ' + ctx.headers['x-playback-session-id']);
+  //   console.log(JSON.stringify(ctx.headers, null, 2));
+
+  //   const positions = range.replace(/bytes=/, '').split('-');
+  //   const file = await fsReadFile(path.join(SOURCE_DIR, rspath));
+  //   const total = file.length;
+  //   const start = Number(positions[0]);
+  //   const end = Number(positions[1] || (total - 1))
+  //   const headers = {
+  //     'Content-Range': `bytes ${start}-${end}/${total}`,
+  //     'Accept-Ranges': 'bytes',
+  //     'Content-Length': end - start + 1,
+  //     'Content-Type': 'video/mp4',
+  //     // 'Keep-Alive': 'timeout=5, max=100'
+  //   }
+  //   ctx.set(headers);
+
+  //   console.log('***************    ');
+  //   console.log(JSON.stringify(headers, null, 2))
+  //   console.log('----------------------------------------')
+  //   ctx.status = 206;
+  //   ctx.body = file.slice(start, end + 1);
+  // })
+  // 获取 poster
+  .get('/poster/:path', async ctx => {
+    const rspath = decodeURIComponent(ctx.params.path); // 路由参数路径
+    const fullpath = path.join(SOURCE_DIR, rspath); // 完整资源路径
+    const dirname = path.dirname(fullpath); // 资源所在文件夹
+    const md5 = crypto.createHash('md5');
+    md5.update(rspath);
+    const name = md5.digest('hex'); // poster 名，不包括扩展名
+
+    const posterPath = path.join(dirname, name + '.poster');
+    try {
+      await fsAccess(posterPath);
+    } catch(err) {
+      const res = await ffmpeg.getVideoSceenshots(fullpath, dirname, name);
+      if(res) {
+        const posterPath = path.join(dirname, name + '_1.jpg'); // poster 完整路径名
+        await fsRename(posterPath, path.join(dirname, name + '.poster'));
+      }
+    } finally {
+      const poster = await fsReadFile(posterPath);
+      ctx.set('Content-Type', 'image/jpeg');
+      ctx.body = poster;
+    }
   })
   .get('/test', async ctx => {
     const { value } = ctx.query;
