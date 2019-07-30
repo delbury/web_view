@@ -2,6 +2,7 @@ const Koa = require('koa');
 const path = require('path');
 const Router = require('koa-router');
 const koaStatic = require('koa-static');
+// const koaOnerror = require('koa-onerror');
 // const range = require('koa-range');
 const expert = require('chai').expect;
 const fs = require('fs');
@@ -20,6 +21,7 @@ const {
 } = require('./modules/getFiles');
 const HOST = ''; // 'http://192.168.0.104:4000'
 const SOURCE_DIR = path.join(__dirname, '/pd');
+const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
 
 // 主体
 (async () => {
@@ -146,7 +148,15 @@ const SOURCE_DIR = path.join(__dirname, '/pd');
     ctx.status = 404;
   });
 
-  app.on('error', err => console.log(err));
+  app.on('error', err => {
+    const errCode = err.code;
+    if(!excludeErrorCodes.includes(errCode)) {
+      let msg = 'An error occured : ' + errCode;
+      console.log(Array(60).fill('*').join(''));
+      console.log(err);
+      console.log(Array(60).fill('*').join(''));
+    }
+  });
 
   app
     .use(koaStatic(path.join(__dirname, '/pd')))

@@ -29,7 +29,7 @@ class PageVideosIndex extends Component {
           tabBarBackgroundColor="rgba(0, 0, 0, 0)"
           tabBarTextStyle={{ fontSize: '0.8em' }}
           animated={false}
-          swipeable={true}
+          swipeable={false}
           page={this.state.currentTabIndex}
           onChange={(tab, index) => this.setState({ currentTabIndex: index })}
         >
