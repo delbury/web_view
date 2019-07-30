@@ -19,3 +19,10 @@ export const getTree = async (ars) => {
     params: ars
   });
 };
+
+
+export function consoleTest(value) {
+  window.fetch(HOST + '/test?value=' + value, {
+    method: 'get',
+  });
+}

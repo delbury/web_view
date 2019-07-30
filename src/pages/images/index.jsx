@@ -3,7 +3,9 @@ import { Flex, Tabs } from 'antd-mobile';
 import RandomPage from './subpages/randomPage';
 import ClassifyPage from './subpages/classifyPage';
 import FolderPage from './subpages/folderPage';
-import Hammer from 'hammerjs';
+import { bindSwipeEvent } from '../../libs/swipeable';
+import { setImagesHammer, clearImagesHammer } from '../../store/action';
+import { connect } from 'react-redux';
 
 class PageImageIndex extends Component {
   constructor() {
@@ -24,14 +26,35 @@ class PageImageIndex extends Component {
   }
 
   componentDidMount() {
-    console.log(this.refs.tabs)
+    const element = document.querySelector('#images-content');
+    this.hammer = bindSwipeEvent(element, ev => {
+      // ev.offsetDirection: rtl: 2, ltr: 4
+      const dir = ev.offsetDirection;
+      const cti = this.state.currentTabIndex;
+      if(dir === 4) {
+        if(cti > 0) {
+          this.setState({ currentTabIndex: cti - 1 });
+        }
+      } else if(dir === 2) {
+        if(cti < this.state.tabs.length - 1) {
+          this.setState({ currentTabIndex: cti + 1 });
+        }
+      }
+    });
+    // this.props.setImagesHammer({ data: hammer });
+  }
+  componentWillUnmount() {
+    // this.props.clearImagesHammer();
+    if(this.hammer) {
+      this.hammer.unbind();
+      this.hammer = null;
+    }
   }
 
   render() {
     return (
-      <Flex>
+      <Flex id="images-content">
         <Tabs
-          ref="tabs"
           tabs={this.state.tabs}
           tabBarBackgroundColor="rgba(0, 0, 0, 0)"
           tabBarTextStyle={{ fontSize: '0.8em' }}
@@ -40,13 +63,19 @@ class PageImageIndex extends Component {
           page={this.state.currentTabIndex}
           onChange={(tab, index) => this.setState({ currentTabIndex: index })}
         >
-          <RandomPage></RandomPage>
+          <RandomPage hammer={this.hammer}></RandomPage>
           <ClassifyPage onChangePage={this.handleChangePage}></ClassifyPage>
-          <FolderPage></FolderPage>
+          <FolderPage hammer={this.hammer}></FolderPage>
         </Tabs>
       </Flex>
     );
   }
 }
 
-export default PageImageIndex;
+export default connect(
+  null,
+  {
+    setImagesHammer,
+    clearImagesHammer
+  }
+)(PageImageIndex);

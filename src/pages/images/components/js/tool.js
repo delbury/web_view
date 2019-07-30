@@ -16,10 +16,3 @@ export function preventPullToRefresh(element) {
     });
 };
 
-// const URL = 'http://192.168.191.1:4000';
-const URL = 'http://192.168.0.104:4000';
-export function consoleTest(value) {
-  window.fetch(URL + '/test?value=' + value, {
-    method: 'get',
-  });
-}

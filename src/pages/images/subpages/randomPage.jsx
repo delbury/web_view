@@ -24,12 +24,14 @@ class RandomPageImages extends Component {
   }
   handleImagesViewClick = (ev) => {
     this.setState({ showView: false });
+    this.props.hammer.enable();
   }
   handleImageClick = (index) => {
     this.setState({
       showView: true,
       index
     });
+    this.props.hammer.disable();
   }
   handleChangeImage = async ev => {
     const index = this.state.index;
