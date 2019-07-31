@@ -159,6 +159,13 @@ const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
   });
 
   app
+    .use(async (ctx, next) => {
+      // 缓存控制
+      if(ctx.headers['accept'].indexOf('image') > -1) {
+        ctx.set('Cache-Control', 'max-age=1800');
+      }
+      await next();
+    })
     .use(koaStatic(path.join(__dirname, '/pd')))
     .use(async (ctx, next) => {
       ctx.set('Access-Control-Allow-Origin', "*");

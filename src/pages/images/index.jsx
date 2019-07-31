@@ -6,6 +6,7 @@ import FolderPage from './subpages/folderPage';
 import { bindSwipeEvent } from '../../libs/swipeable';
 import { setImagesHammer, clearImagesHammer } from '../../store/action';
 import { connect } from 'react-redux';
+import { consoleTest } from '../../api';
 
 class PageImageIndex extends Component {
   constructor() {
@@ -19,6 +20,11 @@ class PageImageIndex extends Component {
       currentTabIndex: 0
     };
     this.hammer = null;
+    this.scrollTops = {
+      '0': 0,
+      '1': 0,
+      '2': 0
+    };
   }
 
   handleChangePage = ev => {
@@ -31,13 +37,29 @@ class PageImageIndex extends Component {
       // ev.offsetDirection: rtl: 2, ltr: 4
       const dir = ev.offsetDirection;
       const cti = this.state.currentTabIndex;
+      const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+      
       if(dir === 4) {
         if(cti > 0) {
-          this.setState({ currentTabIndex: cti - 1 });
+          this.scrollTops[cti] = scrollTop;
+          this.setState({ currentTabIndex: cti - 1 }, () => {
+            const ctiTop = this.scrollTops[cti - 1];
+            if(ctiTop !== 0) {
+              document.documentElement.scrollTop = ctiTop;
+              document.body.scrollTop = ctiTop;       
+            }
+          });
         }
       } else if(dir === 2) {
         if(cti < this.state.tabs.length - 1) {
-          this.setState({ currentTabIndex: cti + 1 });
+          this.scrollTops[cti] = scrollTop;
+          this.setState({ currentTabIndex: cti + 1 }, () => {
+            const ctiTop = this.scrollTops[cti + 1];
+            if(ctiTop !== 0) {
+              document.documentElement.scrollTop = ctiTop;
+              document.body.scrollTop = ctiTop;       
+            }
+          });
         }
       }
     });
@@ -51,6 +73,15 @@ class PageImageIndex extends Component {
     }
   }
 
+  handleTabChange = (tab, index) => {
+    this.setState({ currentTabIndex: index });
+    const ctiTop = this.scrollTops[index];
+    if(ctiTop !== 0) {
+      document.documentElement.scrollTop = ctiTop;
+      document.body.scrollTop = ctiTop;       
+    }
+  }
+
   render() {
     return (
       <Flex id="images-content">
@@ -61,7 +92,7 @@ class PageImageIndex extends Component {
           animated={false}
           swipeable={false}
           page={this.state.currentTabIndex}
-          onChange={(tab, index) => this.setState({ currentTabIndex: index })}
+          onTabClick={this.handleTabChange}
         >
           <RandomPage hammer={this.hammer}></RandomPage>
           <ClassifyPage onChangePage={this.handleChangePage}></ClassifyPage>
