@@ -28,7 +28,11 @@ class PageImageIndex extends Component {
   }
 
   handleChangePage = ev => {
-    this.setState({ currentTabIndex: ev });
+    this.saveScrollTop(1);
+    this.setState({ currentTabIndex: ev }, () => {
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0; 
+    });
   }
 
   componentDidMount() {
@@ -37,28 +41,19 @@ class PageImageIndex extends Component {
       // ev.offsetDirection: rtl: 2, ltr: 4
       const dir = ev.offsetDirection;
       const cti = this.state.currentTabIndex;
-      const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
       
       if(dir === 4) {
         if(cti > 0) {
-          this.scrollTops[cti] = scrollTop;
+          this.saveScrollTop(cti);
           this.setState({ currentTabIndex: cti - 1 }, () => {
-            const ctiTop = this.scrollTops[cti - 1];
-            if(ctiTop !== 0) {
-              document.documentElement.scrollTop = ctiTop;
-              document.body.scrollTop = ctiTop;       
-            }
+            this.restoreScrollTop(cti - 1)    
           });
         }
       } else if(dir === 2) {
         if(cti < this.state.tabs.length - 1) {
-          this.scrollTops[cti] = scrollTop;
+          this.saveScrollTop(cti);
           this.setState({ currentTabIndex: cti + 1 }, () => {
-            const ctiTop = this.scrollTops[cti + 1];
-            if(ctiTop !== 0) {
-              document.documentElement.scrollTop = ctiTop;
-              document.body.scrollTop = ctiTop;       
-            }
+            this.restoreScrollTop(cti + 1)    
           });
         }
       }
@@ -75,11 +70,18 @@ class PageImageIndex extends Component {
 
   handleTabChange = (tab, index) => {
     this.setState({ currentTabIndex: index });
+    this.restoreScrollTop(index);
+  }
+
+  saveScrollTop = (index) => {
+    const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+    this.scrollTops[index] = scrollTop;
+  }
+
+  restoreScrollTop = (index) => {
     const ctiTop = this.scrollTops[index];
-    if(ctiTop !== 0) {
-      document.documentElement.scrollTop = ctiTop;
-      document.body.scrollTop = ctiTop;       
-    }
+    document.documentElement.scrollTop = ctiTop;
+    document.body.scrollTop = ctiTop;    
   }
 
   render() {

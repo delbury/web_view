@@ -22,9 +22,14 @@
   }
   .am-list-item {
     margin-bottom: 5px;
-    background-color: #40a9ff;
 
-    &.images-empty {
+    &.images {
+      background-color: #40a9ff;
+    }
+    &.videos {
+      background-color: #00924c;
+    }
+    &.empty {
       background-color: #bfbfbf;
     }
 

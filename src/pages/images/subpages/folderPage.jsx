@@ -9,9 +9,11 @@ class FolderPageImages extends Component {
     super();
     this.state = {
       showView: false,
-      index: 0
+      index: 0,
+      currentLen: 0
     };
     this.len = 0;
+    this.IMGS = [];
   }
   handleImagesViewClick = (ev) => {
     this.setState({ showView: false });
@@ -36,11 +38,36 @@ class FolderPageImages extends Component {
       });
     }
   }
-  render() {
-    const IMGS = this.props.folder.files ? 
+
+  handleScroll = ev => {
+    const { scrollHeight, clientHeight } = document.documentElement;
+    const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+    if((clientHeight + scrollTop) - scrollHeight > -20) {
+      if(this.state.currentLen < this.len) {
+        this.setState(state => ({ currentLen: state.currentLen + 20 }));
+      }
+    }
+  }
+
+  componentDidUpdate(props, state) {
+    if(props.folder !== this.props.folder) {
+      this.IMGS = this.props.folder.files ? 
       this.props.folder.files.filter(item => item.type === 'image')
       : [];
-    this.len = IMGS.length;
+      this.len = this.IMGS.length;
+      this.setState({ currentLen: 20 });
+    }
+  }
+
+  componentDidMount() {
+    window.addEventListener('scroll', this.handleScroll);
+  }
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this.handleScroll);
+  }
+
+  render() {
+    const IMGS = this.IMGS.slice(0, this.state.currentLen);
     return (
       <div>
         <Grid

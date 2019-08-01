@@ -4,7 +4,7 @@ import { Route, Redirect, withRouter } from 'react-router-dom';
 import NavBar from './components/navbar';
 import PageHome from './pages/home';
 import PageImages from './pages/images';
-import PageVideos from './pages/videos';
+// import PageVideos from './pages/videos';
 import { enmuCreater } from './libs/util';
 import { WingBlank } from 'antd-mobile';
 import { BackTop } from 'antd';
@@ -15,7 +15,7 @@ import { getTreeActionAsync } from './store/action';
 const PAGE_ROUTERS = enmuCreater([
   '/home',
   '/images',
-  '/videos'
+  // '/videos'
 ]);
 class App extends Component {
   constructor(props) {
@@ -47,7 +47,7 @@ class App extends Component {
           <CacheSwitch>
             <Route exact path={PAGE_ROUTERS[0]} component={PageHome}></Route>
             <CacheRoute exact path={PAGE_ROUTERS[1]} component={PageImages}></CacheRoute>
-            <CacheRoute exact path={PAGE_ROUTERS[2]} component={PageVideos}></CacheRoute>
+            {/* <CacheRoute exact path={PAGE_ROUTERS[2]} component={PageVideos}></CacheRoute> */}
             <Redirect to="/home"></Redirect>
           </CacheSwitch>
         </WingBlank>

@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Flex } from 'antd-mobile';
 import './home.scss';
 
-
 class PageHome extends Component {
   constructor() {
     super();
@@ -150,7 +149,26 @@ class PageHome extends Component {
     animateFrame(() => {
       ctx.drawImage(canvas, 0, 0);
     });
+
+    document.ontouchstart = ev => {
+      const { clientX, clientY } = ev.touches[0];
+      targetCenter = [clientX, clientY];
+    };
+    document.ontouchmove = ev => {
+      const { clientX, clientY } = ev.touches[0];
+      targetCenter = [clientX, clientY];
+    };
+    document.ontouchend = ev => {
+      targetCenter = null;
+    };
   }
+
+  componentWillUnmount() {
+    document.ontouchstart = null;
+    document.ontouchmove = null;
+    document.ontouchend = null;
+  }
+
   render() {
     return (
       <Flex className="container">

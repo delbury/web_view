@@ -7,7 +7,7 @@ class NavBar extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      pages: ['Home', 'Images', 'Videos']
+      pages: ['Home', 'Files']
     };
   }
   handleSegChange = ev => {

@@ -24,10 +24,16 @@ function ComputedAccordion(props) {
           >
             <List>
               <ListItem
-                className={item.files.filter(item => item.type === 'image').length ? '' : 'images-empty'}
-                onClick={() => props.onClick(item)}                    
+                className={item.files.filter(item => item.type === 'image').length ? 'images' : 'empty'}
+                onClick={() => props.onClickImages(item)}                    
               >
                 {`${str}Images: ${item.files.filter(item => item.type === 'image').length}`}
+              </ListItem>
+              <ListItem
+                className={item.files.filter(item => item.type === 'video').length ? 'videos' : 'empty'}
+                onClick={() => props.onClickVideos(item)}                    
+              >
+                {`${str}videos: ${item.files.filter(item => item.type === 'video').length}`}
               </ListItem>
             </List>
             {
@@ -35,7 +41,8 @@ function ComputedAccordion(props) {
                 <ComputedAccordion
                   treeNode={item.children}
                   level={props.level + 1}
-                  onClick={props.onClick}
+                  onClickImages={props.onClickImages}
+                  onClickVideos={props.onClickVideos}
                 />
               ) : ''
             }
@@ -47,11 +54,15 @@ function ComputedAccordion(props) {
 }
 
 class ClassifyPageImages extends Component {
-  handleClickDir = ev => {
+  handleClickImagesDir = ev => {
     this.props.setFolder({ data: ev });
     if(ev.files.length !== 0) {
       this.props.onChangePage(2);
     }
+  }
+
+  handleClickVideosDir = ev => {
+    console.log(ev);
   }
 
   render() {
@@ -63,7 +74,8 @@ class ClassifyPageImages extends Component {
           <ComputedAccordion
             treeNode={this.props.tree}
             level={0}
-            onClick={this.handleClickDir}
+            onClickImages={this.handleClickImagesDir}
+            onClickVideos={this.handleClickVideosDir}
           />
         </Flex>
       </div>

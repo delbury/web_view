@@ -4,7 +4,7 @@ import { Icon } from 'antd';
 import './style/image.scss';
 import Hammer from 'hammerjs';
 // import Zmage from 'react-zmage';
-import { preventPullToRefresh } from './js/tool';
+import { preventPullToRefresh } from '../../../libs/util';
 
 export default class ImagesView extends Component {
   constructor() {
