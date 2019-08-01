@@ -33,6 +33,11 @@ class FolderPageImages extends Component {
         index: index > 0 ? index - 1 : this.len - 1
       });
     } else {
+      if(index >= this.state.currentLen - 1) {
+        if(this.state.currentLen < this.len) {
+          this.setState(state => ({ currentLen: state.currentLen + 20 }));
+        }
+      }
       this.setState({
         index: index < this.len - 1 ? index + 1 : 0
       });
