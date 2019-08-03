@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { Flex, Accordion, List, WhiteSpace } from 'antd-mobile';
-// import { Collapse } from 'antd';
+import { Icon } from 'antd';
 import { connect } from 'react-redux';
 import './style.scss';
 import { setSelectedImagesFolder } from '../../../store/action';
+import Video from '../components/video';
 
 const AccordionPanel = Accordion.Panel;
 const ListItem = List.Item;
@@ -16,44 +17,81 @@ function ComputedAccordion(props) {
   return (
     <Accordion accordion style={style}>
       {
-        treeNode.map(item => (
-          <AccordionPanel
-            header={str + item.dirname}
-            key={item.id}
-            className="accordion-dir"
-          >
-            <List>
-              <ListItem
-                className={item.files.filter(item => item.type === 'image').length ? 'images' : 'empty'}
-                onClick={() => props.onClickImages(item)}                    
-              >
-                {`${str}Images: ${item.files.filter(item => item.type === 'image').length}`}
-              </ListItem>
-              <ListItem
-                className={item.files.filter(item => item.type === 'video').length ? 'videos' : 'empty'}
-                onClick={() => props.onClickVideos(item)}                    
-              >
-                {`${str}videos: ${item.files.filter(item => item.type === 'video').length}`}
-              </ListItem>
-            </List>
-            {
-              item.children.length !== 0 ? (
-                <ComputedAccordion
-                  treeNode={item.children}
-                  level={props.level + 1}
-                  onClickImages={props.onClickImages}
-                  onClickVideos={props.onClickVideos}
-                />
-              ) : ''
-            }
-          </AccordionPanel>
-        ))
+        treeNode.map(item => {
+          const imagesLen = item.files.filter(item => item.type === 'image').length;
+          const videos = item.files.filter(item => item.type === 'video');
+          const videosLen = videos.length;
+          return (
+            <AccordionPanel
+              header={str + item.dirname}
+              key={item.id}
+            >
+              <List>
+                {
+                  imagesLen ?
+                  (
+                    <ListItem
+                      className={imagesLen ? 'images' : 'empty'}
+                      onClick={() => props.onClickImages(item)}                    
+                    >
+                      {`${str}Images: ${imagesLen}`}
+                    </ListItem>
+                  ) : ''
+                }
+                {
+                  videosLen ?
+                  (
+                    <Accordion accordion>
+                      <AccordionPanel
+                        header={`${str}Videos: ${videosLen}`}
+                        className="accordion-videolist"
+                      >
+                        <List style={{ paddingLeft: (props.level + 1) * 5 + 'px' }}>
+                          {
+                            videos.map((item, index) => (
+                              <ListItem
+                                className="video-item"
+                                key={index}
+                                onClick={() => props.onClickVideos(item)}
+                              >
+                                {item.alt}
+                                <Icon type="play-circle" />
+                              </ListItem>
+                            ))
+                          }
+                        </List>
+                      </AccordionPanel>
+                    </Accordion>
+                  ) : ''
+                }
+              </List>
+              {
+                item.children.length !== 0 ? (
+                  <ComputedAccordion
+                    treeNode={item.children}
+                    level={props.level + 1}
+                    onClickImages={props.onClickImages}
+                    onClickVideos={props.onClickVideos}
+                  />
+                ) : ''
+              }
+            </AccordionPanel>
+          )
+        })
       }
     </Accordion>
   );
 }
 
 class ClassifyPageImages extends Component {
+  constructor() {
+    super();
+    this.state = {
+      showVideo: false,
+      video: {}
+    };
+  }
+
   handleClickImagesDir = ev => {
     this.props.setFolder({ data: ev });
     if(ev.files.length !== 0) {
@@ -62,11 +100,17 @@ class ClassifyPageImages extends Component {
   }
 
   handleClickVideosDir = ev => {
-    console.log(ev);
+    this.setState({
+      video: ev,
+      showVideo: true
+    });
+  }
+
+  handleCloseVideo = ev => {
+    this.setState({ showVideo: false });
   }
 
   render() {
-    // const CollapsePanel = Collapse.Panel;
     return (
       <div className="image-classify">
         <WhiteSpace/>
@@ -78,6 +122,11 @@ class ClassifyPageImages extends Component {
             onClickVideos={this.handleClickVideosDir}
           />
         </Flex>
+        {
+          this.state.showVideo ? (
+            <Video onClose={this.handleCloseVideo} video={this.state.video} />
+          ) : ''
+        }
       </div>
     );
   }

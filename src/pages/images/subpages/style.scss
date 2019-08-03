@@ -1,11 +1,30 @@
-.image-classify {  
+.image-classify {
+  .am-list-body {
+    background-color: transparent;
+
+    .am-list-content {
+      i.anticon {
+        position: absolute;
+        display: block;
+        top: 15px;
+        right: 15px;
+      }
+    }
+  }
   .am-accordion {
-    margin-top: 10px;
+    // margin-top: 10px;
     width: 100%;
     
     .am-accordion-item {
       .am-accordion-header {
         background-color: #003a8c;
+        color: #fff;
+        border-radius: 5px;
+        margin-bottom: 5px;
+      }
+
+      & .accordion-videolist .am-accordion-header {
+        background-color: #00924c;
         color: #fff;
         border-radius: 5px;
         margin-bottom: 5px;
@@ -31,6 +50,9 @@
     }
     &.empty {
       background-color: #bfbfbf;
+    }
+    &.video-item {
+      background-color: #76d0a3;
     }
 
     .am-list-line .am-list-content {

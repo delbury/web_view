@@ -11,13 +11,6 @@ class PageHome extends Component {
       worker: null
     }
   }
-  componentWillUnmount() {
-    this.setState({
-      canvas: null,
-      ctx: null,
-      worker: null
-    });
-  }
   componentDidMount() {
     const canvas = this.refs.canvas;
     canvas.width = window.innerWidth;
@@ -164,6 +157,11 @@ class PageHome extends Component {
   }
 
   componentWillUnmount() {
+    this.setState({
+      canvas: null,
+      ctx: null,
+      worker: null
+    });
     document.ontouchstart = null;
     document.ontouchmove = null;
     document.ontouchend = null;

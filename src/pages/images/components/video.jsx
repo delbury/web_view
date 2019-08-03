@@ -1,17 +1,26 @@
 import React, { Component } from 'react';
+import { Icon } from 'antd';
 import './style/video.scss';
 
 export default class PageImages extends Component {
+  handleTouchMove = ev => {
+    ev.stopPropagation();
+  }
   render() {
     const video = this.props.video;
     return (
-      <div className="videobox">
+      <div className="videobox"
+        onTouchMove={this.handleTouchMove}
+        onClick={ev => ev.stopPropagation()}
+      >
+        <Icon
+          type="close-circle"
+          onClick={this.props.onClose}
+        />
         <video
-          // preload="metadata"
           poster={window.API_BASE_URL + video.posterPath}
           controls
           playsInline
-          // poster="/test-sources/1.jpg"
           src={window.API_BASE_URL + video.sourcrPath}
           type="video/mp4"
         ></video>

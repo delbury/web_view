@@ -66,12 +66,15 @@ async function getFiles(baseUrl, tree = sources.dirsTree) {
         // 图片
         type = 'image';
         sources.imageList.push(srcobj);
-        
+        tree.files.push({
+          ...srcobj,
+          type
+        });
       } else if(videoReg.test(ext)) {
         // 视频
         type = 'video';
         const bp = encodeURIComponent(path.relative(resourceBaseUrl, fullName));
-        sources.videoList.push({
+        const tempObj = {
           ...srcobj,
           sourcrPath: path.format({
             dir: rootPath,
@@ -81,12 +84,13 @@ async function getFiles(baseUrl, tree = sources.dirsTree) {
             dir: rootPath,
             base: '/poster/' + bp
           })
+        };
+        sources.videoList.push(tempObj);
+        tree.files.push({
+          ...tempObj,
+          type
         });
       }
-      tree.files.push({
-        ...srcobj,
-        type
-      });
     }
   }
 }
