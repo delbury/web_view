@@ -9,78 +9,98 @@ import Video from '../components/video';
 const AccordionPanel = Accordion.Panel;
 const ListItem = List.Item;
 
-function ComputedAccordion(props) {
-  const treeNode = props.treeNode || [];
-  const str = Array(props.level).fill('-').join('') + ' ';
-  const gapValue = props.level * 5 + 'px';
-  const style = { paddingLeft: gapValue };
-  return (
-    <Accordion accordion style={style}>
-      {
-        treeNode.map(item => {
-          const imagesLen = item.files.filter(item => item.type === 'image').length;
-          const videos = item.files.filter(item => item.type === 'video');
-          const videosLen = videos.length;
-          return (
-            <AccordionPanel
-              header={str + item.dirname}
-              key={item.id}
-            >
-              <List>
-                {
-                  imagesLen ?
-                  (
-                    <ListItem
-                      className={imagesLen ? 'images' : 'empty'}
-                      onClick={() => props.onClickImages(item)}                    
-                    >
-                      {`${str}Images: ${imagesLen}`}
-                    </ListItem>
-                  ) : ''
-                }
-                {
-                  videosLen ?
-                  (
-                    <Accordion accordion>
-                      <AccordionPanel
-                        header={`${str}Videos: ${videosLen}`}
-                        className="accordion-videolist"
+class ComputedAccordion extends Component {
+  constructor() {
+    super();
+    this.state = {
+      hasVideoOpened: false
+    };
+  }
+  render() {
+    const props = this.props;
+    const treeNode = props.treeNode || [];
+    const str = Array(props.level).fill('-').join('') + ' ';
+    const gapValue = props.level * 5 + 'px';
+    const style = { paddingLeft: gapValue };
+    return (
+      <Accordion accordion style={style}>
+        {
+          treeNode.map(item => {
+            const imagesLen = item.files.filter(item => item.type === 'image').length;
+            const videos = item.files.filter(item => item.type === 'video');
+            const videosLen = videos.length;
+            return (
+              <AccordionPanel
+                header={str + item.dirname}
+                key={item.id}
+              >
+                <List>
+                  {
+                    imagesLen ?
+                    (
+                      <ListItem
+                        className={imagesLen ? 'images' : 'empty'}
+                        onClick={() => props.onClickImages(item)}                    
                       >
-                        <List style={{ paddingLeft: (props.level + 1) * 5 + 'px' }}>
+                        {`${str}Images: ${imagesLen}`}
+                      </ListItem>
+                    ) : ''
+                  }
+                  {
+                    videosLen ?
+                    (
+                      <Accordion accordion onChange={ev => {
+                        if(ev === undefined) {
+                          this.setState({ hasVideoOpened: false });
+                        } else {
+                          this.setState({ hasVideoOpened: true });
+                        }
+                      }}>
+                        <AccordionPanel
+                          header={`${str}Videos: ${videosLen}`}
+                          className="accordion-videolist"
+                        >
                           {
-                            videos.map((item, index) => (
-                              <ListItem
-                                className="video-item"
-                                key={index}
-                                onClick={() => props.onClickVideos(item)}
-                              >
-                                {item.alt}
-                                <Icon type="play-circle" />
-                              </ListItem>
-                            ))
+                            // this.state.hasVideoOpened ?
+                            // (
+                              <List style={{ paddingLeft: (props.level + 1) * 5 + 'px' }}>
+                                {
+                                  videos.map((item, index) => (
+                                    <ListItem
+                                      className="video-item"
+                                      key={index}
+                                      onClick={() => props.onClickVideos(item)}
+                                    >
+                                      {item.alt}
+                                      <Icon type="play-circle" />
+                                    </ListItem>
+                                  ))
+                                }
+                              </List>
+                          //   ) : ''
                           }
-                        </List>
-                      </AccordionPanel>
-                    </Accordion>
+                        </AccordionPanel>
+                      </Accordion>
+                    ) : ''
+                  }
+                </List>
+                {
+                  item.children.length !== 0 ? (
+                    <ComputedAccordion
+                      treeNode={item.children}
+                      level={props.level + 1}
+                      onClickImages={props.onClickImages}
+                      onClickVideos={props.onClickVideos}
+                    />
                   ) : ''
                 }
-              </List>
-              {
-                item.children.length !== 0 ? (
-                  <ComputedAccordion
-                    treeNode={item.children}
-                    level={props.level + 1}
-                    onClickImages={props.onClickImages}
-                    onClickVideos={props.onClickVideos}
-                  />
-                ) : ''
-              }
-            </AccordionPanel>
-          )
-        })
-      }
-    </Accordion>
-  );
+              </AccordionPanel>
+            )
+          })
+        }
+      </Accordion>
+    );
+  }
 }
 
 class ClassifyPageImages extends Component {

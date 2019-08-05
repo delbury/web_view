@@ -1,4 +1,4 @@
-const ffmpeg = require('ffmpeg');
+const ffmpeg = require('./ffmpeg/index.js');
 const path = require('path');
 
 // 获取时长
@@ -15,6 +15,8 @@ function getVideoTotalDuration(videoPath) {
 
 //获取视频缩略图
 async function getVideoSceenshots(videoPath, outPutPath, filename, frameRate = 1, frameCount = 1) {
+  videoPath = videoPath.split(path.sep).join('/');
+  outPutPath = outPutPath.split(path.sep).join('/');
   const pro = new ffmpeg(videoPath);
   return new Promise((resolve, reject) => {
     pro.then(function (video) {
@@ -26,11 +28,13 @@ async function getVideoSceenshots(videoPath, outPutPath, filename, frameRate = 1
         if (!error) {
           console.log('poster saved !');
           resolve(true)
+        } else {
+          console.log('1.Error: ' + JSON.stringify(error, null, 2));
+          reject(false);
         }
-        reject(false);
       })
     }, function (err) {
-      console.log('Error: ' + err);
+      console.log('2.Error: ' + JSON.stringify(err, null, 2));
       reject(false);
     });
   });

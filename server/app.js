@@ -10,12 +10,13 @@ const promisify= require('util').promisify;
 const fsReadFile = promisify(fs.readFile);
 const fsRename = promisify(fs.rename);
 const fsAccess = promisify(fs.access);
+const fsStat = promisify(fs.stat);
 
 const crypto = require('crypto');
 
 const ffmpeg = require('./modules/ffmpeg');
 const tools = require('./modules/tools'); // shuffle
-const {
+let {
   init,
   sources: { dirsTree, imageList, videoList }
 } = require('./modules/getFiles');
@@ -26,7 +27,12 @@ const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
 // 主体
 (async () => {
   // 获取本地资源列表
-  await init(path.resolve(__dirname, './pd'), { hasInput: false, host: HOST });
+  const localTree = await init(path.resolve(__dirname, './pd'), { hasInput: true, host: HOST });
+  if(localTree) {
+    dirsTree = localTree.dirsTree || {};
+    imageList = localTree.imageList || [];
+    videoList = localTree.videoList || [];
+  }
   let randomImages = tools.shuffle(imageList);
   let randomVideos = tools.shuffle(videoList);
 
@@ -65,25 +71,66 @@ const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
   })
   // 播放视频
   .get('/play/:path', async ctx => {
-    const rspath = decodeURIComponent(ctx.params.path);
-    const range = ctx.headers.range;
-
-    const positions = range.replace(/bytes=/, '').split('-');
-    const file = await fsReadFile(path.join(SOURCE_DIR, rspath));
-    const total = file.length;
-    const start = Number(positions[0]);
-    const end = Number(positions[1] || (total - 1))
-    const headers = {
-      'Content-Range': `bytes ${start}-${end}/${total}`,
-      'Accept-Ranges': 'bytes',
-      'Content-Length': end - start + 1,
-      'Content-Type': 'video/mp4',
-      // 'Keep-Alive': 'timeout=5, max=100'
+    const rspath = path.join(
+      SOURCE_DIR,
+      decodeURIComponent(ctx.params.path)
+    );
+    let res = null;
+    // 获取资源信息
+    try {
+      res = await fsStat(rspath);
+    } catch (err) {
+      ctx.status = 404;
+      return;
     }
-    ctx.set(headers);
 
-    ctx.status = 206;
-    ctx.body = file.slice(start, end + 1);
+    // 获取 range 信息
+    const range = ctx.headers.range;
+    if (range) {
+      const positions = range.replace(/bytes=/, '').split('-');
+
+      const total = res ? res.size : 0;
+      const start = Number(positions[0]);
+      let end = Number(positions[1] || (total - 1));
+      if(positions[1]) {
+        end = Number(positions[1]);
+      } else if(total - start > 10 * 1000 ** 2 ) {
+        end = start + 10 * 1000 ** 2;
+        if(end > total - 1) {
+          end = total - 1;
+        }
+      }
+      const headers = {
+        'Content-Range': `bytes ${start}-${end}/${total}`,
+        'Accept-Ranges': 'bytes',
+        'Content-Length': end - start + 1,
+        'Content-Type': 'video/mp4'
+      }
+
+      // 视频流
+      const vs = fs.createReadStream(rspath, {
+        start,
+        end
+      });
+      await new Promise((resolve, reject) => {
+        const chunks = [];
+        let size = 0;
+        vs.on('data', data => {
+          chunks.push(data);
+          size += data.length;
+        })
+        vs.on('end', () => {
+          const buffer = Buffer.concat(chunks, size);
+          ctx.status = (start === 0 && end === 1) ? 200 : 206; 
+          ctx.set(headers);
+          ctx.body = buffer;
+          resolve();
+        });
+        vs.on('error', () => {
+          reject();
+        });
+      });
+    }
   })
   // .get('/play/:path', async ctx => {
   //   const rspath = decodeURIComponent(ctx.params.path);
@@ -122,18 +169,28 @@ const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
     const name = md5.digest('hex'); // poster 名，不包括扩展名
 
     const posterPath = path.join(dirname, name + '.poster');
+    let errFlag = false;
     try {
       await fsAccess(posterPath);
     } catch(err) {
-      const res = await ffmpeg.getVideoSceenshots(fullpath, dirname, name);
-      if(res) {
-        const posterPath = path.join(dirname, name + '_1.jpg'); // poster 完整路径名
-        await fsRename(posterPath, path.join(dirname, name + '.poster'));
+      try {
+        const res = await ffmpeg.getVideoSceenshots(fullpath, dirname, name);
+        if(res) {
+          const posterPath = path.join(dirname, name + '_1.jpg'); // poster 完整路径名
+          await fsRename(posterPath, path.join(dirname, name + '.poster'));
+        }
+      } catch (err) {
+        errFlag = true;
+        console.log('got poster failed ! ', err);
       }
     } finally {
-      const poster = await fsReadFile(posterPath);
-      ctx.set('Content-Type', 'image/jpeg');
-      ctx.body = poster;
+      if(!errFlag) {
+        const poster = await fsReadFile(posterPath);
+        ctx.set('Content-Type', 'image/jpeg');
+        ctx.body = poster;
+      } else {
+        ctx.status = 500;
+      }
     }
   })
   .get('/test', async ctx => {

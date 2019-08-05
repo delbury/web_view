@@ -76,6 +76,7 @@ class RandomPageImages extends Component {
   }
 
   handleScroll = ev => {
+    if(this.props.currentTabIndex !== 0) return;
     const { scrollHeight, clientHeight } = document.documentElement;
     const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
     if((clientHeight + scrollTop) - scrollHeight > -20) {

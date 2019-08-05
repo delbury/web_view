@@ -96,7 +96,7 @@ class PageImageIndex extends Component {
           page={this.state.currentTabIndex}
           onTabClick={this.handleTabChange}
         >
-          <RandomPage hammer={this.hammer}></RandomPage>
+          <RandomPage hammer={this.hammer} currentTabIndex={this.state.currentTabIndex}></RandomPage>
           <ClassifyPage onChangePage={this.handleChangePage}></ClassifyPage>
           <FolderPage hammer={this.hammer}></FolderPage>
         </Tabs>

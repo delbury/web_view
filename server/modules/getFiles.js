@@ -122,9 +122,10 @@ async function init(url, { hasInput = true, host = '/' } = { hasInput: true, hos
       await refreshFilesInfo(url);
     } else {
       const info = await readInfo(path.join(__dirname, FILES_INFO_NAME));
-      sources.dirsTree = info.dirsTree || {};
-      sources.imageList = info.imageList || [];
-      sources.videoList = info.videoList || [];
+      // sources.dirsTree = info.dirsTree || {};
+      // sources.imageList = info.imageList || [];
+      // sources.videoList = info.videoList || [];
+      return info;
     }
   } catch(err) {
     await refreshFilesInfo(url);
