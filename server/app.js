@@ -94,8 +94,8 @@ const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
       let end = Number(positions[1] || (total - 1));
       if(positions[1]) {
         end = Number(positions[1]);
-      } else if(total - start > 10 * 1000 ** 2 ) {
-        end = start + 10 * 1000 ** 2;
+      } else {
+        end = start + 2 ** 18;
         if(end > total - 1) {
           end = total - 1;
         }

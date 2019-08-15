@@ -13,7 +13,8 @@ class ComputedAccordion extends Component {
   constructor() {
     super();
     this.state = {
-      hasVideoOpened: false
+      hasVideoOpened: false,
+      videos: []
     };
   }
   render() {
@@ -50,10 +51,14 @@ class ComputedAccordion extends Component {
                     videosLen ?
                     (
                       <Accordion accordion onChange={ev => {
+                        console.log(ev)
                         if(ev === undefined) {
                           this.setState({ hasVideoOpened: false });
+                          window.setTimeout(() => {
+                            this.setState({ videos: [] });
+                          }, 220);
                         } else {
-                          this.setState({ hasVideoOpened: true });
+                          this.setState({ hasVideoOpened: true, videos });
                         }
                       }}>
                         <AccordionPanel
@@ -65,14 +70,22 @@ class ComputedAccordion extends Component {
                             // (
                               <List style={{ paddingLeft: (props.level + 1) * 5 + 'px' }}>
                                 {
-                                  videos.map((item, index) => (
+                                  this.state.videos.map((item, index) => (
                                     <ListItem
                                       className="video-item"
                                       key={index}
                                       onClick={() => props.onClickVideos(item)}
                                     >
-                                      {item.alt}
-                                      <Icon type="play-circle" />
+                                      <div className="video-item-info">
+                                        {item.alt}
+                                        <Icon type="play-circle" />
+                                      </div>
+                                      <div className="video-item-img">
+                                        <img
+                                          src={window.API_BASE_URL + item.posterPath}
+                                          alt={item.alt}
+                                        />
+                                      </div>
                                     </ListItem>
                                   ))
                                 }
