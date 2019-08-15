@@ -1,2 +1,3 @@
 # TODOs
-	1. videos 获取问题，改为视频流
+	1. 禁止上拉、下拉触底反弹
+	2. apple-touch-startup-image 问题

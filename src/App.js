@@ -11,6 +11,7 @@ import { BackTop } from 'antd';
 import CacheRoute, { CacheSwitch } from 'react-router-cache-route';
 import { connect } from 'react-redux';
 import { getTreeActionAsync } from './store/action';
+import { consoleTest } from './api';
 
 const PAGE_ROUTERS = enmuCreater([
   '/home',
@@ -33,6 +34,9 @@ class App extends Component {
   changePage = (pageIndex) => {
     this.setState({ currentPage: pageIndex });
     this.props.history.push(PAGE_ROUTERS[pageIndex]);
+  }
+  componentDidMount() {
+    // consoleTest(window.innerHeight);
   }
   render() {
     const currentPage = this.state.currentPage;
