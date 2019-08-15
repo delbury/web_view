@@ -5,13 +5,26 @@
   <meta charset="utf-8" />
   <link rel="shortcut icon" href="%PUBLIC_URL%/apple-icon.png" />
   <!-- 不使用 width=device-width -->
-  <meta name="viewport" content="initial-scale=1, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="initial-scale=1, user-scalable=no" />
   <meta name="theme-color" content="#000000" />
   <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
-  <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+  <!-- <link rel="manifest" href="%PUBLIC_URL%/manifest.json"> -->
+
+
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-touch-fullscreen" content="yes">
+  <meta name="apple-mobile-web-app-title" content="WebSite">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="apple-touch-icon" href="%PUBLIC_URL%/apple-icon.png" sizes="400x400">
+  <!-- iOS 8 iPhone 6 Plus (portrait) -->
+  <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/apple-start-image-1242x2208.png"
+    media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)" sizes="1242x2208">
+
+
   <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
@@ -23,11 +36,6 @@
     -->
   <title>React App</title>
   <!-- <base href="<%= process.env.REACT_APP_API_BASE_URL %>"> -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-sttus-bar-style" content="black">
-  <link rel="apple-touch-icon" href="%PUBLIC_URL%/apple-icon.png">
-  <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/apple-start-image.png" sizes="1080x1900">
-  <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/apple-start-image-h.png" sizes="1920x1060">
 </head>
 
 <body>
