@@ -53,6 +53,10 @@
     }
     &.video-item {
       background-color: #76d0a3;
+
+      .am-list-content {
+        padding-right: 25px;
+      }
     }
 
     .am-list-line .am-list-content {

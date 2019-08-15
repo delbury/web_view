@@ -120,6 +120,7 @@ class ClassifyPageImages extends Component {
   }
 
   handleClickVideosDir = ev => {
+    document.body.style.overflow = 'hidden';
     this.setState({
       video: ev,
       showVideo: true
@@ -127,6 +128,7 @@ class ClassifyPageImages extends Component {
   }
 
   handleCloseVideo = ev => {
+    document.body.style.overflow = '';
     this.setState({ showVideo: false });
   }
 
