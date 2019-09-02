@@ -17,9 +17,10 @@ class PageImageIndex extends Component {
         { title: 'Classify' },
         { title: 'Folder' }
       ],
-      currentTabIndex: 0
+      currentTabIndex: 0,
+      hammer: null
     };
-    this.hammer = null;
+    // this.state.hammer = null;
     this.scrollTops = {
       '0': 0,
       '1': 0,
@@ -37,7 +38,7 @@ class PageImageIndex extends Component {
 
   componentDidMount() {
     const element = document.querySelector('#images-content');
-    this.hammer = bindSwipeEvent(element, ev => {
+    const hammer = bindSwipeEvent(element, ev => {
       // ev.offsetDirection: rtl: 2, ltr: 4
       const dir = ev.offsetDirection;
       const cti = this.state.currentTabIndex;
@@ -58,13 +59,14 @@ class PageImageIndex extends Component {
         }
       }
     });
+    this.setState({ hammer });
     // this.props.setImagesHammer({ data: hammer });
   }
   componentWillUnmount() {
     // this.props.clearImagesHammer();
-    if(this.hammer) {
-      this.hammer.unbind();
-      this.hammer = null;
+    if(this.state.hammer) {
+      this.state.hammer.unbind();
+      // this.setState({ hammer: null });
     }
   }
 
@@ -96,9 +98,9 @@ class PageImageIndex extends Component {
           page={this.state.currentTabIndex}
           onTabClick={this.handleTabChange}
         >
-          <RandomPage hammer={this.hammer} currentTabIndex={this.state.currentTabIndex}></RandomPage>
+          <RandomPage hammer={this.state.hammer} currentTabIndex={this.state.currentTabIndex}></RandomPage>
           <ClassifyPage onChangePage={this.handleChangePage}></ClassifyPage>
-          <FolderPage hammer={this.hammer}></FolderPage>
+          <FolderPage hammer={this.state.hammer}></FolderPage>
         </Tabs>
       </Flex>
     );

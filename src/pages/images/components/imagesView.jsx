@@ -51,6 +51,8 @@ export default class ImagesView extends Component {
     // this.spinImage(90);
   }
   componentDidMount() {
+    // document.body.style.overflow = 'hidden';
+
     this.iv = this.refs.imageview;
     this.iv.onload = ev => {
       const { width, height } = this.iv;
@@ -141,6 +143,7 @@ export default class ImagesView extends Component {
 
     // 旋转
     if(this.state.spinable) {
+      this.hammer.get('pan').set({ direction: Hammer.DIRECTION_ALL });
       this.hammer.on('press', ev => {
         ev.preventDefault();
         this.setState({ frozen: true });
@@ -149,6 +152,7 @@ export default class ImagesView extends Component {
           this.hammer.off('panmove', fnMove);
           this.hammer.off('panend', fnEnd);
           this.hammer.off('pressup', fnEnd);
+          this.hammer.off('pancancel', fnEnd);
         };
         const fnMove = ev => {
           const { deltaX: x, deltaY: y} = ev;
@@ -163,6 +167,7 @@ export default class ImagesView extends Component {
         this.hammer.on('panmove', fnMove);
         this.hammer.on('panend', fnEnd);
         this.hammer.on('pressup', fnEnd);
+        this.hammer.on('pancancel', fnEnd);
       });
     }
     // 旋转结束
