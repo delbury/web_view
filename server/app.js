@@ -20,14 +20,15 @@ let {
   init,
   sources: { dirsTree, imageList, videoList }
 } = require('./modules/getFiles');
-const HOST = ''; // 'http://192.168.0.104:4000'
-const SOURCE_DIR = path.join(__dirname, '/pd');
+const HOST = ''; // 'http://192.168.0.103:4000'
+const RESOURCE_DIR_NAME = 'pd';
+const SOURCE_DIR = path.join(__dirname, '/' + RESOURCE_DIR_NAME);
 const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
 
 // 主体
 (async () => {
   // 获取本地资源列表
-  const localTree = await init(path.resolve(__dirname, './pd'), { hasInput: true, host: HOST });
+  const localTree = await init(path.resolve(__dirname, './' +　RESOURCE_DIR_NAME), { hasInput: true, host: HOST });
   if(localTree) {
     dirsTree = localTree.dirsTree || {};
     imageList = localTree.imageList || [];
@@ -223,7 +224,7 @@ const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
       }
       await next();
     })
-    .use(koaStatic(path.join(__dirname, '/pd')))
+    .use(koaStatic(path.join(__dirname, '/' + RESOURCE_DIR_NAME)))
     .use(async (ctx, next) => {
       ctx.set('Access-Control-Allow-Origin', "*");
       await next();
