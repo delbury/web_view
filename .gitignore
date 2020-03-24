@@ -17,7 +17,7 @@
 .env.development.local
 .env.test.local
 .env.production.local
-.env.development
+# .env.development
 
 npm-debug.log*
 yarn-debug.log*
@@ -26,4 +26,5 @@ yarn-error.log*
 /public/test-sources/*
 /server/test-resources/*
 /server/modules/files_info.json
+/server/modules/files_stats.json
 /server/pd

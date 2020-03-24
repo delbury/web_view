@@ -3,7 +3,7 @@ const fs = require('fs');
 const readline = require('readline');
 const expect = require('chai').expect;
 
-const promisify= require('util').promisify;
+const promisify = require('util').promisify;
 const fsReaddir = promisify(fs.readdir);
 const fsStat = promisify(fs.stat);
 const fsWriteFile = promisify(fs.writeFile);
@@ -27,6 +27,7 @@ const sources = {
 const imageReg = /\.(jpg)|(jpeg)|(png)|(gif)/i;
 const videoReg = /\.(mp4)|(ogg)|(webm)/i;
 const FILES_INFO_NAME = 'files_info.json';
+const FILES_STATS_NAME = 'files_stats.json';
 
 async function getFiles(baseUrl, tree = sources.dirsTree) {
   const rootDirName = path.basename(baseUrl);
@@ -36,12 +37,12 @@ async function getFiles(baseUrl, tree = sources.dirsTree) {
   // 获取文件夹下所有文件
   const files = await fsReaddir(baseUrl);
   expect(files).not.to.be.equal(null);
-  for await(let item of files) {
+  for await (let item of files) {
     const fullName = path.join(baseUrl, item);
     const stats = await fsStat(fullName);
     expect(stats).not.to.be.equal(null);
 
-    if(stats.isDirectory()) {
+    if (stats.isDirectory()) {
       // 是文件夹
       const child = {
         dirname: '',
@@ -62,7 +63,7 @@ async function getFiles(baseUrl, tree = sources.dirsTree) {
         }),
         alt: item
       };
-      if(imageReg.test(ext)) {
+      if (imageReg.test(ext)) {
         // 图片
         type = 'image';
         sources.imageList.push(srcobj);
@@ -70,7 +71,7 @@ async function getFiles(baseUrl, tree = sources.dirsTree) {
           ...srcobj,
           type
         });
-      } else if(videoReg.test(ext)) {
+      } else if (videoReg.test(ext)) {
         // 视频
         type = 'video';
         const bp = encodeURIComponent(path.relative(resourceBaseUrl, fullName));
@@ -95,10 +96,17 @@ async function getFiles(baseUrl, tree = sources.dirsTree) {
   }
 }
 
+// 保存文件夹信息
 async function saveInfo(url, obj) {
   await fsWriteFile(path.join(url, FILES_INFO_NAME), JSON.stringify(obj));
 }
 
+// 保存修改时间
+async function saveFileStat(url, obj) {
+  await fsWriteFile(path.join(url, FILES_STATS_NAME), JSON.stringify(obj));
+}
+
+// 获取保存的信息
 async function readInfo(url) {
   const str = await fsReadFile(url);
   return JSON.parse(str);
@@ -114,12 +122,33 @@ async function refreshFilesInfo(url) {
 
 // 初始化
 async function init(url, { hasInput = true, host = '/' } = { hasInput: true, host: '/' }) {
-  rootPath = host
+  rootPath = host;
+  let needReloadFiles = false; // 是否需要重新加载文件夹信息
+
+  // 判断文件是否被修改
+  try {
+    await fsAccess(path.join(__dirname, FILES_STATS_NAME));
+    const currentStat = await fsStat(url);
+    const oldStat = await readInfo(path.join(__dirname, FILES_STATS_NAME));
+
+    // 文件修改过
+    if (currentStat.ctimeMs === oldStat.ctimeMs) {
+      needReloadFiles = false;
+    } else {
+      await saveFileStat(__dirname, currentStat);
+      needReloadFiles = true;
+    }
+  } catch (err) {
+    const stat = await fsStat(url);
+    await saveFileStat(__dirname, stat);
+    needReloadFiles = true;
+  }
+
   try {
     await fsAccess(path.join(__dirname, FILES_INFO_NAME));
     const kw = hasInput ? (await getInputKeywords()).toLowerCase() : 'n';
-    if(kw === 'n' || kw === 'no') {
-      await refreshFilesInfo(url);
+    if (kw === 'n' || kw === 'no') {
+      needReloadFiles && await refreshFilesInfo(url);
     } else {
       const info = await readInfo(path.join(__dirname, FILES_INFO_NAME));
       // sources.dirsTree = info.dirsTree || {};
@@ -127,7 +156,7 @@ async function init(url, { hasInput = true, host = '/' } = { hasInput: true, hos
       // sources.videoList = info.videoList || [];
       return info;
     }
-  } catch(err) {
+  } catch (err) {
     await refreshFilesInfo(url);
   }
 }
@@ -137,7 +166,7 @@ async function getInputKeywords() {
     input: process.stdin,
     output: process.stdout
   });
-  
+
   return new Promise((resolve, reject) => {
     rl.question(
       'get the info buy the existing file ? ( yes / no ): ',
