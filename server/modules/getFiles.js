@@ -148,8 +148,13 @@ async function init(url, { hasInput = true, host = '/', forceReload = false } = 
   try {
     await fsAccess(path.join(__dirname, FILES_INFO_NAME));
     const kw = hasInput ? (await getInputKeywords()).toLowerCase() : 'n';
-    if (kw === 'n' || kw === 'no' || forceReload) {
-      (forceReload || needReloadFiles) && await refreshFilesInfo(url);
+    if (kw === 'n' || kw === 'no') {
+      if(forceReload || needReloadFiles) {
+        await refreshFilesInfo(url)
+      } else {
+        const info = await readInfo(path.join(__dirname, FILES_INFO_NAME));
+        return info;
+      }
     } else {
       const info = await readInfo(path.join(__dirname, FILES_INFO_NAME));
       // sources.dirsTree = info.dirsTree || {};
