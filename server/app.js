@@ -44,9 +44,16 @@ const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
   const router = new Router();
 
   router
+    // 每一次返回不同的随机图片
+    .get('/images/each-random', async ctx => {
+      ctx.body = {
+        code: 0,
+        msg: 'successed',
+        ...tools.eachRandomResource(ctx, randomImages)
+      }
+    })
     // 随机图片
     .get('/images/random', async ctx => {
-
       ctx.body = {
         code: 0,
         // data: randomImages,

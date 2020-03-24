@@ -9,6 +9,7 @@ const fsStat = promisify(fs.stat);
 const fsWriteFile = promisify(fs.writeFile);
 const fsAccess = promisify(fs.access);
 const fsReadFile = promisify(fs.readFile);
+const ignoreReg = /^ignore__.*/; // 过滤的文件名后缀
 let resourceBaseUrl = '';
 let rootPath = '';
 let id = 1;
@@ -37,7 +38,7 @@ async function getFiles(baseUrl, tree = sources.dirsTree) {
   // 获取文件夹下所有文件
   const files = await fsReaddir(baseUrl);
   expect(files).not.to.be.equal(null);
-  for await (let item of files) {
+  for await (let item of files.filter(item => !ignoreReg.test(item))) {
     const fullName = path.join(baseUrl, item);
     const stats = await fsStat(fullName);
     expect(stats).not.to.be.equal(null);
@@ -121,7 +122,7 @@ async function refreshFilesInfo(url) {
 }
 
 // 初始化
-async function init(url, { hasInput = true, host = '/' } = { hasInput: true, host: '/' }) {
+async function init(url, { hasInput = true, host = '/', forceReload = false } = { hasInput: true, host: '/' }) {
   rootPath = host;
   let needReloadFiles = false; // 是否需要重新加载文件夹信息
 
@@ -147,8 +148,8 @@ async function init(url, { hasInput = true, host = '/' } = { hasInput: true, hos
   try {
     await fsAccess(path.join(__dirname, FILES_INFO_NAME));
     const kw = hasInput ? (await getInputKeywords()).toLowerCase() : 'n';
-    if (kw === 'n' || kw === 'no') {
-      needReloadFiles && await refreshFilesInfo(url);
+    if (kw === 'n' || kw === 'no' || forceReload) {
+      (forceReload || needReloadFiles) && await refreshFilesInfo(url);
     } else {
       const info = await readInfo(path.join(__dirname, FILES_INFO_NAME));
       // sources.dirsTree = info.dirsTree || {};

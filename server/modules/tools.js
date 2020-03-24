@@ -1,6 +1,7 @@
 const expert = require('chai').expect;
 const cloneDeep = require('lodash').cloneDeep;
 
+// 随机排列
 function shuffle(array) {
   array = cloneDeep(array);
   let m = array.length, t, i;
@@ -16,6 +17,7 @@ function shuffle(array) {
   return array;
 }
 
+// 资源分页
 function computedResource(ctx, arr) {
   const pageNum = Number(ctx.query.pageNum || 1);
   const pageSize = Number(ctx.query.pageSize || 20);
@@ -29,14 +31,35 @@ function computedResource(ctx, arr) {
   };
 }
 
+// 返回随机资源
+function eachRandomResource(ctx, arr) {
+  const pageSize = Number(ctx.query.pageSize || 20);
+  const len = arr.length;
+  const temp = Array.from({ length: len }, (v, i) => i);
+  const data = [];
+
+  // 随机算法
+  for (let i = len - 1; i >= len - pageSize; i--) {
+    const index = Math.floor(Math.random() * i);
+    [temp[i], temp[index]] = [temp[index], temp[i]];
+    data.push(arr[temp[i]]);
+  }
+
+  return {
+    hasNext: true,
+    data
+  }
+}
+
+// 文件数树
 function getTree(tree, ids = '1') {
   expert(tree).not.to.be.equal(undefined);
   const arr = ids.split(',');
   let id = '1';
   let subTree = tree;
-  while(id = arr.shift()) {
+  while (id = arr.shift()) {
     tree.children.forEach(item => {
-      if(item.id == id) {
+      if (item.id == id) {
         subTree = item;
       }
     });
