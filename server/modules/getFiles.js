@@ -38,7 +38,7 @@ async function getFiles(baseUrl, tree = sources.dirsTree) {
   // 获取文件夹下所有文件
   const files = await fsReaddir(baseUrl);
   expect(files).not.to.be.equal(null);
-  for await (let item of files.filter(item => !ignoreReg.test(item))) {
+  for await (let item of files.filter(it => !ignoreReg.test(it))) {
     const fullName = path.join(baseUrl, item);
     const stats = await fsStat(fullName);
     expect(stats).not.to.be.equal(null);

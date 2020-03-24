@@ -9,9 +9,7 @@ import { HashRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import store from './store';
 
-(process.env.NODE_ENV === 'development') ?
-  (window.API_BASE_URL = process.env.REACT_APP_API_BASE_URL) :
-  (window.API_BASE_URL = '');
+window.API_BASE_URL = process.env.REACT_APP_API_BASE_URL
 
 ReactDOM.render(
   <Provider store={store}>
