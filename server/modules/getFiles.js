@@ -186,5 +186,6 @@ async function getInputKeywords() {
 
 module.exports = {
   init,
-  sources
+  sources,
+  saveFileStat
 }

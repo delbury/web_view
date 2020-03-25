@@ -18,18 +18,21 @@ const ffmpeg = require('./modules/ffmpeg');
 const tools = require('./modules/tools'); // shuffle
 let {
   init,
-  sources: { dirsTree, imageList, videoList }
+  sources: { dirsTree, imageList, videoList },
+  saveFileStat
 } = require('./modules/getFiles');
 const HOST = ''; // 'http://192.168.0.103:4000'
+const INFO_FILES_DIR = path.resolve(__dirname, './modules');
 const RESOURCE_DIR_NAME = 'pd';
 const SOURCE_DIR = path.join(__dirname, '/' + RESOURCE_DIR_NAME);
 const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
 
 // 主体
 (async () => {
+  const resourceBase = path.resolve(__dirname, './' + RESOURCE_DIR_NAME);
   // 获取本地资源列表
   const localTree = await init(
-    path.resolve(__dirname, './' + RESOURCE_DIR_NAME),
+    resourceBase,
     { hasInput: false, host: HOST }
   );
   if (localTree) {
@@ -189,6 +192,7 @@ const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
           if (res) {
             const posterPath = path.join(dirname, name + '_1.jpg'); // poster 完整路径名
             await fsRename(posterPath, path.join(dirname, name + '.poster'));
+            saveFileStat(INFO_FILES_DIR, await fsStat(resourceBase)); // 更新状态文件
           }
         } catch (err) {
           errFlag = true;
