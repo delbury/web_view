@@ -18,7 +18,7 @@ const ffmpeg = require('./modules/ffmpeg');
 const tools = require('./modules/tools'); // shuffle
 let {
   init,
-  sources: { dirsTree, imageList, videoList },
+  sources: { dirsTree, imageList, videoList, audioList },
   saveFileStat
 } = require('./modules/getFiles');
 const HOST = ''; // 'http://192.168.0.103:4000'
@@ -53,6 +53,14 @@ const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
         code: 0,
         msg: 'successed',
         ...tools.eachRandomResource(ctx, randomImages)
+      }
+    })
+    // 每一次返回不同的随机音频
+    .get('/audio/each-random', async ctx => {
+      ctx.body = {
+        code: 0,
+        msg: 'successed',
+        ...tools.eachRandomResource(ctx, audioList)
       }
     })
     // 随机图片

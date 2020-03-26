@@ -39,14 +39,14 @@ function eachRandomResource(ctx, arr) {
   const data = [];
 
   // 随机算法
-  for (let i = len - 1; i >= len - pageSize; i--) {
-    const index = Math.floor(Math.random() * i);
+  for (let i = len - 1; i >= Math.max(len - pageSize, 0); i--) {
+    const index = Math.floor(Math.random() * (i + 1));
     [temp[i], temp[index]] = [temp[index], temp[i]];
     data.push(arr[temp[i]]);
   }
 
   return {
-    hasNext: true,
+    hasNext: len > pageSize,
     data
   }
 }
@@ -72,5 +72,6 @@ function getTree(tree, ids = '1') {
 module.exports = {
   shuffle,
   computedResource,
-  getTree
+  getTree,
+  eachRandomResource
 }

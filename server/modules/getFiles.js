@@ -22,11 +22,13 @@ const sources = {
     id: ''
   },
   imageList: [],
-  videoList: []
+  videoList: [],
+  audioList: []
 };
 
 const imageReg = /\.(jpg)|(jpeg)|(png)|(gif)/i;
 const videoReg = /\.(mp4)|(ogg)|(webm)/i;
+const audioReg = /\.(mp3)|(ogg)|(wav)/i;
 const FILES_INFO_NAME = 'files_info.json';
 const FILES_STATS_NAME = 'files_stats.json';
 
@@ -90,6 +92,14 @@ async function getFiles(baseUrl, tree = sources.dirsTree) {
         sources.videoList.push(tempObj);
         tree.files.push({
           ...tempObj,
+          type
+        });
+      } else if (audioReg.test(ext)) {
+        // 音频
+        type = 'audio';
+        sources.audioList.push(srcobj);
+        tree.files.push({
+          ...srcobj,
           type
         });
       }
