@@ -1,5 +1,5 @@
 const Koa = require('koa');
-const path = require('path');
+const path = require('path').posix;
 const Router = require('koa-router');
 const koaStatic = require('koa-static');
 // const koaOnerror = require('koa-onerror');
@@ -23,17 +23,18 @@ let {
 } = require('./modules/getFiles');
 const HOST = ''; // 'http://192.168.0.103:4000'
 const INFO_FILES_DIR = path.resolve(__dirname, './modules');
+const RESOURCE_BASE_DIR = './'; // 'G:/learnspace/github/web_view/server';
 const RESOURCE_DIR_NAME = 'pd';
-const SOURCE_DIR = path.join(__dirname, '/' + RESOURCE_DIR_NAME);
+const SOURCE_DIR = path.join(RESOURCE_BASE_DIR, '/' + RESOURCE_DIR_NAME);
 const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
 
 // 主体
 (async () => {
-  const resourceBase = path.resolve(__dirname, './' + RESOURCE_DIR_NAME);
+  const resourceBase = SOURCE_DIR;
   // 获取本地资源列表
   const localTree = await init(
     resourceBase,
-    { hasInput: false, host: HOST }
+    { hasInput: false, host: HOST, forceReload: true }
   );
   if (localTree) {
     dirsTree = localTree.dirsTree || {};
@@ -246,7 +247,7 @@ const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
       }
       await next();
     })
-    .use(koaStatic(path.join(__dirname, '/' + RESOURCE_DIR_NAME)))
+    .use(koaStatic(SOURCE_DIR))
     .use(async (ctx, next) => {
       ctx.set('Access-Control-Allow-Origin', "*");
       await next();

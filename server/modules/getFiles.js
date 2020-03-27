@@ -34,7 +34,7 @@ const FILES_STATS_NAME = 'files_stats.json';
 
 async function getFiles(baseUrl, tree = sources.dirsTree) {
   const rootDirName = path.basename(baseUrl);
-  tree.dirname = rootDirName; // 记录文件夹名称
+  tree.dirname = path.basename(rootDirName); // 记录文件夹名称
   tree.id = id++;
 
   // 获取文件夹下所有文件
