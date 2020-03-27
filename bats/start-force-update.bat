@@ -23,14 +23,18 @@ exit
 
 :error_nginx_dir
 echo nginx file dir was not found.
+pause
 exit
 :error_nginx_starting
 echo nginx start failed.
+pause
 exit
 
 :error_server_dir
 echo server file dir was not found.
+pause
 exit
 :error_server_starting
 echo server start failed.
+pause
 exit

@@ -1,4 +1,4 @@
-.videobox {
+.mediabox {
   position: fixed;
   left: 0;
   top: 0;
@@ -14,12 +14,12 @@
   z-index: 99;
   // pointer-events: none;
 
-  video {
+  audio, video {
     width: 100%;
   }
   i.anticon {
     position: absolute;
-    top: 1em;
+    top: 10vh;
     right: 1em;
     z-index: 100;
     font-size: 2em;

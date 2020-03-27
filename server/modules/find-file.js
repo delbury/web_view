@@ -4,13 +4,13 @@
 const path = require('path').posix;
 const promisify = require('util').promisify;
 const fs = require('fs');
-const fsReadFile = promisify(fs.readFile);
+const fsWriteFile = promisify(fs.writeFile);
 const fsReaddir = promisify(fs.readdir);
 const fsStat = promisify(fs.stat);
 const { cloneDeep } = require('lodash');
 // const fsAccess = promisify(fs.access);
 const fileReg = /\.(avi)/i;
-const ROOT_DIR = path.resolve(__dirname, '../pd').replace(/\\/g, '/');
+const ROOT_DIR = 'F:/资源'; // path.resolve(__dirname, '../pd').replace(/\\/g, '/');
 const TREE_NODE = {
   children: null,
   matchedFiles: null,
@@ -26,8 +26,8 @@ async function main() {
   try {
     fs.accessSync(ROOT_DIR);
     await readFile(ROOT_DIR, fileTreeRoot);
-    console.log(JSON.stringify(matchedFileList, null, 2));
-    console.log(analyseResult());
+    analyseResult();
+    // console.log(JSON.stringify(matchedFileList, null, 2));
   } catch (err) {
     console.log(err)
   }
@@ -71,8 +71,14 @@ function analyseResult(res = matchedFileList) {
   const total = res ? res.length : 0;
   const diff = Array.from(new Set(res.map(item => item.dirName)));
 
-  return {
+  const obj = {
     total,
     dirs: diff
   };
+
+  fsWriteFile(path.join(__dirname, 'find_file_result.json'), JSON.stringify({ tree: res, dirs: obj }, null, 2));
+  // return {
+  //   total,
+  //   dirs: diff
+  // };
 }

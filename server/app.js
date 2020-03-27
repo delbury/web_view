@@ -23,7 +23,8 @@ let {
 } = require('./modules/getFiles');
 const HOST = ''; // 'http://192.168.0.103:4000'
 const INFO_FILES_DIR = path.resolve(__dirname, './modules');
-const RESOURCE_BASE_DIR = './'; // 'G:/learnspace/github/web_view/server';
+// const RESOURCE_BASE_DIR = 'F:/资源';
+const RESOURCE_BASE_DIR = __dirname;
 const RESOURCE_DIR_NAME = 'pd';
 const SOURCE_DIR = path.join(RESOURCE_BASE_DIR, '/' + RESOURCE_DIR_NAME);
 const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
@@ -34,7 +35,7 @@ const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
   // 获取本地资源列表
   const localTree = await init(
     resourceBase,
-    { hasInput: false, host: HOST, forceReload: true }
+    { hasInput: false, host: HOST, forceReload: false }
   );
   if (localTree) {
     dirsTree = localTree.dirsTree || {};

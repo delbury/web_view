@@ -2,12 +2,12 @@ import React, { Component } from 'react';
 import { Icon } from 'antd';
 import './style/media.scss';
 
-export default class PageVideos extends Component {
+export default class PageAudios extends Component {
   handleTouchMove = ev => {
     ev.stopPropagation();
   }
   render() {
-    const video = this.props.video;
+    const audio = this.props.audio;
     return (
       <div className="mediabox"
         onTouchMove={this.handleTouchMove}
@@ -17,14 +17,13 @@ export default class PageVideos extends Component {
           type="close-circle"
           onClick={this.props.onClose}
         />
-        <video
-          poster={window.API_BASE_URL + video.posterPath}
+        <audio
           controls
           playsInline
-          src={window.API_BASE_URL + video.sourcrPath}
-          type="video/mp4"
+          src={window.API_BASE_URL + audio.src}
           preload="metadata"
-        ></video>
+          volume="1"
+        ></audio>
       </div>
     );
   }
