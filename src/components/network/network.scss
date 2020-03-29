@@ -1,0 +1,17 @@
+.network-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  right: 15px;
+  top: 45px;
+  padding: 0 5px;
+  width: 80px;
+  background-color: #10239e;
+  border-radius: 3px;
+  color: #fff;
+
+  > .text {
+    font-size: 12px;
+  }
+}

@@ -6,6 +6,7 @@ import FolderPage from './subpages/folderPage';
 import { bindSwipeEvent } from '../../libs/swipeable';
 import { setImagesHammer, clearImagesHammer } from '../../store/action';
 import { connect } from 'react-redux';
+// import Network from '../../components/network';
 import { consoleTest } from '../../api';
 
 class PageImageIndex extends Component {

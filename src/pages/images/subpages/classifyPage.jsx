@@ -10,6 +10,7 @@ import Audio from '../components/audio';
 const AccordionPanel = Accordion.Panel;
 const ListItem = List.Item;
 
+
 class ComputedAccordion extends Component {
   constructor() {
     super();
@@ -24,12 +25,35 @@ class ComputedAccordion extends Component {
       audio: null
     };
   }
+
+  // 计算size字符串
+  sizeFormatter(size) {
+    const kb = size / (2 ** 10);
+    const mb = size / (2 ** 20);
+    const gb = size / (2 ** 30);
+    let text = '';
+    if(gb >= 1) {
+      text = gb.toFixed(2) + 'GB';
+    } else if(mb >= 1) {
+      text = mb.toFixed(2) + 'MB';
+    } else if(kb >= 1) {
+      text = kb.toFixed(2) + 'KB';
+    } else {
+      text = size + 'B';
+    }
+    return text;
+  }
+
   render() {
     const props = this.props;
     const treeNode = props.treeNode || [];
     const str = Array(props.level).fill('-').join('') + ' ';
-    const gapValue = props.level * 5 + 'px';
+    const paddingDiv = 10;
+    const k = props.level >= 1 ? 1 : 0;
+    const gapValue = k * paddingDiv + 'px';
     const style = { paddingLeft: gapValue };
+    const listStyle = { paddingLeft: '10px' };
+
     return (
       <Accordion accordion style={style}>
         {
@@ -37,8 +61,10 @@ class ComputedAccordion extends Component {
             const images = [];
             const videos = []; 
             const audios = [];
+            let imagesSize = 0;
             item.files.forEach(it => {
               if(it.type === 'image') {
+                imagesSize += +it.size;
                 images.push(it)
               } else if(it.type === 'video') {
                 videos.push(it)
@@ -49,13 +75,31 @@ class ComputedAccordion extends Component {
             const imagesLen = images.length;
             const videosLen = videos.length;
             const audiosLen = audios.length;
-            const isEmpty = !imagesLen && !videosLen && !audiosLen && !item.children.length; // 过滤空文件夹
+            const isEmpty = !item.files.length && !item.children.length; // 过滤空文件夹
+            
+            let currentItem = item; // 子文件夹
+            let dirname = '/' + item.dirname;
+
+            const textArr = [];
+            textArr[0] = imagesLen ? `images: ${imagesLen}` : '';
+            textArr[1] = videosLen ? `videos: ${videosLen}` : '';
+            textArr[2] = audiosLen ? `audios: ${audiosLen}` : '';
+            textArr[3] = currentItem.children.length ? `dirs: ${currentItem.children.length}` : '';
+            const subTitle = textArr.filter(item => item).join(', ');
             return (
               !isEmpty ? <AccordionPanel
-                header={str + item.dirname}
+                header={
+                  <div className="accordion-dirlist-header">
+                    <div className="accordion-dirlist-header-title">
+                      <span>{str + dirname}</span>
+                    </div>
+                    <div className="accordion-dirlist-header-sub">{subTitle}</div>
+                  </div>
+                }
                 key={item.id}
+                className="accordion-dirlist"
               >
-                <List>
+                <List style={listStyle}>
                   {
                     imagesLen ?
                     (
@@ -63,7 +107,15 @@ class ComputedAccordion extends Component {
                         className={imagesLen ? 'images' : 'empty'}
                         onClick={() => props.onClickImages(item)}                    
                       >
-                        {`${str}Images: ${imagesLen}`}
+                        {/* {`${str}Images: ${imagesLen}`} */}
+                        <div className="accordion-dirlist-header">
+                          <div className="accordion-dirlist-header-title">
+                            <span>{`${str}Images: ${imagesLen}`}</span>
+                          </div>
+                          <div className="accordion-dirlist-header-sub">
+                            {`size: ${this.sizeFormatter(imagesSize)}`}
+                          </div>
+                        </div>
                       </ListItem>
                     ) : ''
                   }
@@ -85,7 +137,7 @@ class ComputedAccordion extends Component {
                           className="accordion-audiolist"
                         >
                           {
-                            <List style={{ paddingLeft: (props.level + 1) * 5 + 'px' }}>
+                            <List style={listStyle}>
                               {
                                 this.state.audios.map((item, index) => (
                                   <ListItem
@@ -94,7 +146,14 @@ class ComputedAccordion extends Component {
                                     onClick={() => props.onClickAudios(item)}
                                   >
                                     <div className="audio-item-info">
-                                      {item.alt}
+                                      <div className="accordion-dirlist-header">
+                                        <div className="accordion-dirlist-header-title">
+                                          <span>{item.alt}</span>
+                                        </div>
+                                        <div className="accordion-dirlist-header-sub">
+                                          {`size: ${this.sizeFormatter(item.size)}`}
+                                        </div>
+                                      </div>
                                       <Icon type="play-circle" />
                                     </div>
                                   </ListItem>
@@ -126,7 +185,7 @@ class ComputedAccordion extends Component {
                           {
                             // this.state.hasVideoOpened ?
                             // (
-                              <List style={{ paddingLeft: (props.level + 1) * 5 + 'px' }}>
+                              <List style={listStyle}>
                                 {
                                   this.state.videos.map((item, index) => (
                                     <ListItem
@@ -135,7 +194,14 @@ class ComputedAccordion extends Component {
                                       onClick={() => props.onClickVideos(item)}
                                     >
                                       <div className="video-item-info">
-                                        {item.alt}
+                                        <div className="accordion-dirlist-header">
+                                          <div className="accordion-dirlist-header-title">
+                                            <span>{item.alt}</span>
+                                          </div>
+                                          <div className="accordion-dirlist-header-sub">
+                                            {`size: ${this.sizeFormatter(item.size)}`}
+                                          </div>
+                                        </div>
                                         <Icon type="play-circle" />
                                       </div>
                                       <div className="video-item-img">
@@ -158,13 +224,23 @@ class ComputedAccordion extends Component {
                 {
                   item.children.length !== 0 ? (
                     <ComputedAccordion
-                      treeNode={item.children}
+                      treeNode={currentItem.children}
                       level={props.level + 1}
                       onClickImages={props.onClickImages}
                       onClickVideos={props.onClickVideos}
                       onClickAudios={props.onClickAudios}
                     />
                   ) : ''
+                }
+                {
+                  // <ListItem
+                  //   className="list-actived-close"
+                  //   onClick={() => null}                    
+                  // >
+                  //   {str}
+                  //   <Icon style={{marginRight: '5px'}} type="to-top" />
+                  //   {item.dirname}
+                  // </ListItem>
                 }
               </AccordionPanel> : ''
             )

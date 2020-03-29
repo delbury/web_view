@@ -22,9 +22,9 @@ let {
   saveFileStat
 } = require('./modules/getFiles');
 const HOST = ''; // 'http://192.168.0.103:4000'
-const INFO_FILES_DIR = path.resolve(__dirname, './modules');
-// const RESOURCE_BASE_DIR = 'F:/资源';
-const RESOURCE_BASE_DIR = __dirname;
+const INFO_FILES_DIR = path.join(__dirname, './modules');
+const RESOURCE_BASE_DIR = 'F:/资源';
+// const RESOURCE_BASE_DIR = __dirname;
 const RESOURCE_DIR_NAME = 'pd';
 const SOURCE_DIR = path.join(RESOURCE_BASE_DIR, '/' + RESOURCE_DIR_NAME);
 const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
@@ -49,13 +49,22 @@ const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
   const router = new Router();
 
   router
+    // 重新随机排列照片
+    .post('/images/shuffle', async ctx => {
+      randomImages = tools.shuffle(imageList);
+      ctx.body = {
+        code: 0,
+        msg: 'successed',
+        data: null
+      };
+    })
     // 每一次返回不同的随机图片
     .get('/images/each-random', async ctx => {
       ctx.body = {
         code: 0,
         msg: 'successed',
         ...tools.eachRandomResource(ctx, randomImages)
-      }
+      };
     })
     // 每一次返回不同的随机音频
     .get('/audio/each-random', async ctx => {
@@ -63,7 +72,7 @@ const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
         code: 0,
         msg: 'successed',
         ...tools.eachRandomResource(ctx, audioList)
-      }
+      };
     })
     // 随机图片
     .get('/images/random', async ctx => {
@@ -72,7 +81,7 @@ const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
         // data: randomImages,
         msg: 'successed',
         ...tools.computedResource(ctx, randomImages)
-      }
+      };
     })
     // 随机视频
     .get('/videos/random', async ctx => {
@@ -81,7 +90,7 @@ const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
         // data: randomVideos,
         msg: 'successed',
         ...tools.computedResource(ctx, randomVideos)
-      }
+      };
     })
     // 文件结构
     .get('/tree', async ctx => {
@@ -91,7 +100,7 @@ const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
         msg: 'successed',
         // ...tools.getTree(dirsTree, ids)
         data: [dirsTree]
-      }
+      };
     })
     // 播放视频
     .get('/play/:path', async ctx => {
@@ -110,6 +119,7 @@ const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
 
       // 获取 range 信息
       const range = ctx.headers.range;
+      // console.log(range);
       if (range) {
         const positions = range.replace(/bytes=/, '').split('-');
 
@@ -119,7 +129,7 @@ const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
         if (positions[1]) {
           end = Number(positions[1]);
         } else {
-          end = start + 2 ** 18;
+          end = start + 2 ** 22;
           if (end > total - 1) {
             end = total - 1;
           }

@@ -1,3 +1,17 @@
+$font-color: #fff;
+$dir-header-color: #69c0ff;
+$dir-header-color-actived: #003a8c;
+$dir-header-color-actived-close: #096dd9;
+
+$video-header-color: #00924c;
+$video-item-color: #76d0a3;
+
+$audio-header-color: #d46b08;
+$audio-item-color: #ffa940;
+
+$image-header-color: #a8071a;
+$empty-header-color: #bfbfbf;
+
 .image-classify {
   .am-list-body {
     background-color: transparent;
@@ -17,22 +31,29 @@
     
     .am-accordion-item {
       .am-accordion-header {
-        background-color: #003a8c;
-        color: #fff;
+        background-color: $dir-header-color;
+        color: $font-color;
         border-radius: 5px;
         margin-bottom: 5px;
+
       }
 
       & .accordion-videolist .am-accordion-header {
-        background-color: #00924c;
+        background-color: $video-header-color;
       }
       & .accordion-audiolist .am-accordion-header {
-        background-color: #d46b08;
+        background-color: $audio-header-color;
       }
 
       .am-accordion-content {
         background-color: transparent;
       }
+
+      &.accordion-dirlist.am-accordion-item-active > .am-accordion-header {
+        background-color: $dir-header-color-actived;
+      }
+
+
     }
   }
 
@@ -42,19 +63,28 @@
   .am-list-item {
     margin-bottom: 5px;
 
+    &.list-actived {
+      background-color: $dir-header-color-actived;
+    }
+
+    &.list-actived-close {
+      background-color: $dir-header-color-actived-close;
+    }
+
     &.images {
-      background-color: #40a9ff;
+      background-color: $image-header-color;
     }
     &.videos {
-      background-color: #00924c;
+      background-color: $video-header-color;
     }
     &.empty {
-      background-color: #bfbfbf;
+      background-color: $empty-header-color;
     }
     &.video-item {
-      background-color: #76d0a3;
+      background-color: $video-item-color;
 
       .video-item-info {
+        height: 100%;
         padding-left: 70px;
         padding-right: 25px;
         overflow: hidden;
@@ -67,7 +97,7 @@
         width: 50px;
         top: 0;
         bottom: 0;
-        background-color: #76d0a3;
+        background-color: $video-item-color;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -82,9 +112,10 @@
       }
     }
     &.audio-item {
-      background-color: #ffa940;
+      background-color: $audio-item-color;
 
       .audio-item-info {
+        height: 100%;
         padding-right: 25px;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -93,7 +124,42 @@
     }
 
     .am-list-line .am-list-content {
-      color: #fff;
+      color: $font-color;
+      padding-top: 0;
+      padding-bottom: 0;
+      height: 100%;
+    }
+  }
+
+  .accordion-dirlist-header {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    & > .accordion-dirlist-header-title {
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      font-weight: bold;
+      line-height: 1;
+      // overflow: hidden;
+      // text-overflow: ellipsis;
+      // white-space: nowrap;
+
+      span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+    & > .accordion-dirlist-header-sub {
+      font-size: 12px;
+      line-height: 1.8;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
   }
 }

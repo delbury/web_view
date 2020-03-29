@@ -72,7 +72,8 @@ async function getFiles(baseUrl, tree = sources.dirsTree) {
         sources.imageList.push(srcobj);
         tree.files.push({
           ...srcobj,
-          type
+          type,
+          size: stats.size
         });
       } else if (videoReg.test(ext)) {
         // 视频
@@ -87,7 +88,8 @@ async function getFiles(baseUrl, tree = sources.dirsTree) {
           posterPath: path.format({
             dir: rootPath,
             base: '/poster/' + bp
-          })
+          }),
+          size: stats.size
         };
         sources.videoList.push(tempObj);
         tree.files.push({
@@ -100,7 +102,8 @@ async function getFiles(baseUrl, tree = sources.dirsTree) {
         sources.audioList.push(srcobj);
         tree.files.push({
           ...srcobj,
-          type
+          type,
+          size: stats.size
         });
       }
     }
@@ -125,6 +128,7 @@ async function readInfo(url) {
 
 async function refreshFilesInfo(url) {
   resourceBaseUrl = url;
+  console.log('------ start getting files... ------');
   await getFiles(url);
   console.log('------ got files info successfully ! ------');
   await saveInfo(__dirname, sources);

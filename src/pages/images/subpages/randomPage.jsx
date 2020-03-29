@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Grid, WhiteSpace } from 'antd-mobile';
+import { Button } from 'antd';
 import Image from '../components/image'
 import ImagesView from '../components/imagesView';
 import { getRandomImages } from '../../../api';
@@ -117,9 +118,15 @@ class RandomPageImages extends Component {
               onChangeImage={this.handleChangeImage}
             ></ImagesView>
           ) : ''
-        }
-      <WhiteSpace size="lg" />
-    </div>
+        } 
+        {/* <Button
+          icon="reload"
+          type="primary" shape="circle"
+          size="small"
+        >
+        </Button> */}
+        <WhiteSpace size="lg" />
+      </div>
     );
   }
 }
