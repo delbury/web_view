@@ -27,4 +27,5 @@ yarn-error.log*
 /server/test-resources/*
 /server/modules/files_info.json
 /server/modules/files_stats.json
+/server/modules/find_file_result.json
 /server/pd

@@ -9,7 +9,7 @@ const fsReaddir = promisify(fs.readdir);
 const fsStat = promisify(fs.stat);
 const { cloneDeep } = require('lodash');
 // const fsAccess = promisify(fs.access);
-const fileReg = /\.(avi)/i;
+const fileReg = /\.(avi|mkv|rm|rmvb|3gp|mov|flv|ts|wmv|zip|rar|7z)/i;
 const ROOT_DIR = 'F:/资源'; // path.resolve(__dirname, '../pd').replace(/\\/g, '/');
 const TREE_NODE = {
   children: null,
