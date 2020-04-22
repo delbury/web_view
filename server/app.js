@@ -11,6 +11,7 @@ const fsReadFile = promisify(fs.readFile);
 const fsRename = promisify(fs.rename);
 const fsAccess = promisify(fs.access);
 const fsStat = promisify(fs.stat);
+const fsWriteFile = promisify(fs.writeFile);
 
 const crypto = require('crypto');
 
@@ -28,6 +29,24 @@ const RESOURCE_BASE_DIR = 'F:/资源';
 const RESOURCE_DIR_NAME = 'pd';
 const SOURCE_DIR = path.join(RESOURCE_BASE_DIR, '/' + RESOURCE_DIR_NAME);
 const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
+const ERROR_LOG_FILE = path.join(__dirname, './modules/error.log')
+
+// 记录log
+async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
+  const date = tools.getCurrentDateTime();
+  try {
+    let log = '';
+    let place = webError ? 'WebError: ' : '';
+    if (err instanceof String) {
+      log = `${date} >>> ${err.code || ' --- '}: ${err.message || '-'}\r\n${err.info ? `${err.info}\r\n` : ''}`;
+    } else {
+      log = `${date} >>> ${err}\r\n`;
+    }
+    await fsWriteFile(path, place + log, { flag: 'a' });
+  } catch (err) {
+    throw err;
+  }
+}
 
 // 主体
 (async () => {
@@ -114,7 +133,7 @@ const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
         res = await fsStat(rspath);
       } catch (err) {
         ctx.status = 404;
-        return;
+        throw err;
       }
 
       // 获取 range 信息
@@ -217,6 +236,7 @@ const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
         } catch (err) {
           errFlag = true;
           console.log('got poster failed ! ', err);
+          throw err;
         }
       } finally {
         if (!errFlag) {
@@ -228,13 +248,17 @@ const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
         }
       }
     })
-    .get('/test', async ctx => {
-      const { value } = ctx.query;
-      console.log('=====================   ', value);
-      ctx.body = {
-        code: 0,
-        msg: 'successed',
+    .get('/log', async ctx => {
+      try {
+        await recordLog(ctx.query.msg, true);
+        ctx.body = {
+          code: 0,
+          msg: 'successed',
+        }
+      } catch (err) {
+        ctx.status = 500
       }
+
     })
     .all('*', async ctx => {
       ctx.status = 404;
@@ -248,6 +272,7 @@ const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
       console.log(err);
       console.log(Array(60).fill('*').join(''));
     }
+    recordLog(err);
   });
 
   app
