@@ -187,11 +187,11 @@ class ComputedAccordion extends Component {
                             // (
                               <List style={listStyle}>
                                 {
-                                  this.state.videos.map((item, index) => (
+                                  this.state.videos.map((item, index, arr) => (
                                     <ListItem
                                       className="video-item"
                                       key={index}
-                                      onClick={() => props.onClickVideos(item)}
+                                      onClick={() => props.onClickVideos(item, index, arr)}
                                     >
                                       <div className="video-item-info">
                                         <div className="accordion-dirlist-header">
@@ -256,7 +256,11 @@ class ClassifyPageImages extends Component {
     super();
     this.state = {
       showVideo: false,
-      video: {}
+      video: {},
+      isLast: false,
+      isFirst: false,
+      currentVideos: [],
+      currentVideoIndex: 0
     };
   }
 
@@ -269,11 +273,15 @@ class ClassifyPageImages extends Component {
   }
 
   // 点击视频header
-  handleClickVideosDir = ev => {
+  handleClickVideosDir = (video, index, arr) => {
     document.body.style.overflow = 'hidden';
     this.setState({
-      video: ev,
-      showVideo: true
+      video,
+      showVideo: true,
+      isFirst: index === 0,
+      isLast: index === arr.length - 1,
+      currentVideos: arr,
+      currentVideoIndex: index
     });
   }
 
@@ -284,6 +292,39 @@ class ClassifyPageImages extends Component {
       audio: ev,
       showAudio: true
     });
+  }
+
+  // 前一个
+  handleBackwardMedia = () => {
+    if(this.state.currentVideoIndex > 0) {
+      const videos = this.state.currentVideos;
+      const index = this.state.currentVideoIndex - 1;
+      this.setState({
+        video: videos[index],
+        isFirst: index === 0,
+        isLast: index === videos.length - 1,
+        currentVideoIndex: index
+      });
+    } 
+  }
+
+  // 下一个
+  handleForwardMedia = () => {
+    if(this.state.currentVideoIndex < this.state.currentVideos.length - 1) {
+      const videos = this.state.currentVideos;
+      const index = this.state.currentVideoIndex + 1;
+      this.setState({
+        video: videos[index],
+        isFirst: index === 0,
+        isLast: index === videos.length - 1,
+        currentVideoIndex: index
+      });
+    }
+  }
+
+  // 当前视频播放结束
+  handleVideoEnded = () => {
+    this.handleForwardMedia();
   }
 
   // 关闭
@@ -312,7 +353,15 @@ class ClassifyPageImages extends Component {
         </Flex>
         {
           this.state.showVideo ? (
-            <Video onClose={this.handleCloseMedia} video={this.state.video} />
+            <Video
+              onBackward={this.handleBackwardMedia}
+              onForward={this.handleForwardMedia}
+              onClose={this.handleCloseMedia}
+              onEnded={this.handleVideoEnded}
+              video={this.state.video}
+              isFirst={this.state.isFirst}
+              isLast={this.state.isLast}
+            />
           ) :
           this.state.showAudio ? (
             <Audio onClose={this.handleCloseMedia} audio={this.state.audio} />
