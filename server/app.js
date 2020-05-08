@@ -2,6 +2,7 @@ const Koa = require('koa');
 const path = require('path').posix;
 const Router = require('koa-router');
 const koaStatic = require('koa-static');
+const bodyParser = require('koa-bodyparser');
 // const koaOnerror = require('koa-onerror');
 // const range = require('koa-range');
 const expert = require('chai').expect;
@@ -248,7 +249,7 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
         }
       }
     })
-    .get('/log', async ctx => {
+    .post('/log', async ctx => {
       try {
         await recordLog(ctx.query.msg, true);
         ctx.body = {
@@ -259,6 +260,13 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
         ctx.status = 500
       }
 
+    })
+    .post('/console', async ctx => {
+      console.log('info text: ' + ctx.request.body.msg);
+      ctx.body = {
+        code: 0,
+        msg: 'successed'
+      }
     })
     .all('*', async ctx => {
       ctx.status = 404;
@@ -276,6 +284,7 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
   });
 
   app
+    .use(bodyParser())
     .use(async (ctx, next) => {
       // 缓存控制
       if (ctx.headers['accept'].indexOf('image') > -1) {

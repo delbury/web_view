@@ -13,12 +13,14 @@ export default class PageVideos extends Component {
     // 可以播放
     video.oncanplay = ev => {
       video.play();
+      print('can play...');
     };
 
     // 播放结束
     video.onended = ev => {
       this.props.onEnded();
     };
+
   }
 
   render() {
@@ -30,18 +32,25 @@ export default class PageVideos extends Component {
         onClick={ev => ev.stopPropagation()}
       >
         <div className="icon-box">
-          {
-            !isFirst ? <Icon
-              type="step-backward"
-              onClick={this.props.onBackward}
-            /> : ''
-          }
-          {
-            !isLast ? <Icon
-              type="step-forward"
-              onClick={this.props.onForward}
-            /> : ''
-          }
+          <Icon
+            type="step-backward"
+            onClick={() => {
+              !isFirst && this.props.onBackward();
+            }}
+            style={{color: isFirst ? 'grey' : ''}}
+          />
+          <Icon
+            type="step-forward"
+            onClick={() => {
+              !isLast && this.props.onForward();
+            }}
+            style={{color: isLast ? 'grey' : ''}}
+          />
+          <Icon type="play-circle"
+            onClick={() => {
+              this.refs.video.play();
+            }}
+          />
           <Icon
             type="close"
             onClick={this.props.onClose}
