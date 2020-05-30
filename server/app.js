@@ -147,7 +147,7 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
         const start = Number(positions[0]);
         let end = Number(positions[1] || (total - 1));
         if (positions[1]) {
-          end = Number(positions[1]);
+          end = Math.min(Number(positions[1]), start + 2 ** 22);
         } else {
           end = start + 2 ** 22;
           if (end > total - 1) {
@@ -162,6 +162,7 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
         }
 
         // 视频流
+        // console.log(start.toString().padStart(16, ' '), end.toString().padStart(16, ' '))
         const vs = fs.createReadStream(rspath, {
           start,
           end

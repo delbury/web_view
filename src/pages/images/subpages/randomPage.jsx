@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Grid, WhiteSpace } from 'antd-mobile';
-import { Button } from 'antd';
+import { Grid, WhiteSpace, Flex } from 'antd-mobile';
+import { Icon } from 'antd';
 import Image from '../components/image'
 import ImagesView from '../components/imagesView';
 import { getRandomImages } from '../../../api';
@@ -25,14 +25,14 @@ class RandomPageImages extends Component {
   }
   handleImagesViewClick = (ev) => {
     this.setState({ showView: false });
-    this.props.hammer.enable();
+    this.props.hammer && this.props.hammer.enable();
   }
   handleImageClick = (index) => {
     this.setState({
       showView: true,
       index
     });
-    this.props.hammer.disable();
+    this.props.hammer && this.props.hammer.disable();
   }
   handleChangeImage = async ev => {
     const index = this.state.index;
@@ -95,20 +95,27 @@ class RandomPageImages extends Component {
 
   render() {
     const IMGS = this.state.images;
+    const loading = this.state.loading && !this.state.images.length;
     return (
       <div>
-        <Grid
-          className="imagebox"
-          data={IMGS}
-          renderItem={(item, index) => 
-            <Image
-              img={item}
-              onClick={() => this.handleImageClick(index)}
-            />
-          }
-          columnNum={2}
-        >
-        </Grid>
+        {
+          loading ?
+            <Flex justify="center" direction="column">
+              <Icon type="loading" style={{ fontSize: '40px', marginTop: '1em' }} />
+            </Flex>
+            : <Grid
+              className="imagebox"
+              data={IMGS}
+              renderItem={(item, index) => 
+                <Image
+                  img={item}
+                  onClick={() => this.handleImageClick(index)}
+                />
+              }
+              columnNum={2}
+            >
+            </Grid>
+        }
         {
           this.state.showView ? (
             <ImagesView

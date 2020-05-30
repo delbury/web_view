@@ -342,15 +342,21 @@ class ClassifyPageImages extends Component {
     return (
       <div className="image-classify">
         <WhiteSpace/>
-        <Flex>
-          <ComputedAccordion
-            treeNode={this.props.tree}
-            level={0}
-            onClickImages={this.handleClickImagesDir}
-            onClickVideos={this.handleClickVideosDir}
-            onClickAudios={this.handleClickAudiosDir}
-          />
-        </Flex>
+        {
+          this.props.loadingTree ? 
+            <Flex justify="center" direction="column">
+              <Icon type="loading" style={{ fontSize: '40px', marginTop: '1em' }} />
+            </Flex> :
+            <Flex>
+              <ComputedAccordion
+                treeNode={this.props.tree}
+                level={0}
+                onClickImages={this.handleClickImagesDir}
+                onClickVideos={this.handleClickVideosDir}
+                onClickAudios={this.handleClickAudiosDir}
+              />
+            </Flex>
+        }
         {
           this.state.showVideo ? (
             <Video
@@ -373,6 +379,6 @@ class ClassifyPageImages extends Component {
 }
 
 export default connect(
-  state => ({ tree: state.tree }),
+  state => ({ tree: state.tree, loadingTree: state.loadingTree }),
   { setFolder: setSelectedImagesFolder }
 )(ClassifyPageImages);

@@ -11,6 +11,9 @@ import store from './store';
 
 window.API_BASE_URL = process.env.REACT_APP_API_BASE_URL
 window.print = (msg) => {
+  if(typeof msg === 'object') {
+    msg = JSON.stringify(msg, null, 2);
+  }
   return window.fetch(window.API_BASE_URL + '/console', {
     method: 'post',
     headers: {
@@ -24,7 +27,7 @@ window.addEventListener('error', ev => {
   window.print(ev.message);
 });
 
-window.print(("wkWebView " in window).toString())
+// window.print(("wkWebView " in window).toString());
 
 if ("wView" in window) {
   window.wView.allowsInlineMediaPlayback = "YES";

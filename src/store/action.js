@@ -6,6 +6,8 @@ export const SET_IMAGES_FOLDER = 'SET_IMAGES_FOLDER';
 export const SET_IMAGES_HAMMER = 'SET_IMAGES_HAMMER';
 export const CLEAR_IMAGES_HAMMER = 'CLEAR_IMAGES_HAMMER';
 
+export const LOADING_TREE_CHANGE = 'LOADING_TREE_CHANGE';
+
 const getTreeAction = (content) => ({
   type: GET_TREE,
   value: content.value
@@ -13,7 +15,9 @@ const getTreeAction = (content) => ({
 
 export const getTreeActionAsync = () => {
   return async dispatch => {
+    dispatch(changeLoading({ value: true }));
     const res = (await getTree()).data;
+    dispatch(changeLoading({ value: false }));
     dispatch(getTreeAction({ value: res.data }));
   };
 };
@@ -31,3 +35,8 @@ export const setImagesHammer = (content) => ({
 export const clearImagesHammer = () => ({
   type: CLEAR_IMAGES_HAMMER
 });
+
+export const changeLoading = (content) => ({
+  type: LOADING_TREE_CHANGE,
+  value: content.value
+})

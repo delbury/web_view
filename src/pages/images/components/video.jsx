@@ -16,6 +16,12 @@ export default class PageVideos extends Component {
       print('can play...');
     };
 
+    // 错误
+    video.onerror = ev => {
+      print('video error');
+      print(ev);
+    }
+
     // 播放结束
     video.onended = ev => {
       this.props.onEnded();

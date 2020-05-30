@@ -8,6 +8,7 @@ import { setImagesHammer, clearImagesHammer } from '../../store/action';
 import { connect } from 'react-redux';
 // import Network from '../../components/network';
 import { consoleTest } from '../../api';
+const NO_HAMMER = true;
 
 class PageImageIndex extends Component {
   constructor() {
@@ -39,6 +40,10 @@ class PageImageIndex extends Component {
 
   componentDidMount() {
     const element = document.querySelector('#images-content');
+    
+    if(NO_HAMMER) {
+      return;
+    }
     const hammer = bindSwipeEvent(element, ev => {
       // ev.offsetDirection: rtl: 2, ltr: 4
       const dir = ev.offsetDirection;

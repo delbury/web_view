@@ -4,13 +4,15 @@ import {
   GET_TREE,
   SET_IMAGES_FOLDER,
   SET_IMAGES_HAMMER,
-  CLEAR_IMAGES_HAMMER
+  CLEAR_IMAGES_HAMMER,
+  LOADING_TREE_CHANGE
 } from './action';
 
 const defaultState = {
   tree: [],
   imagesFolder: {},
-  imagesHammer: null
+  imagesHammer: null,
+  loadingTree: false
 }
 
 const reducer = (state = defaultState, action) => {
@@ -34,6 +36,11 @@ const reducer = (state = defaultState, action) => {
       return {
         ...state,
         imagesHammer: null
+      }
+    case LOADING_TREE_CHANGE:
+      return {
+        ...state,
+        loadingTree: action.value
       }
     default: 
       return state;
