@@ -9,30 +9,23 @@ const fsStat = promisify(fs.stat);
 const fsWriteFile = promisify(fs.writeFile);
 const fsAccess = promisify(fs.access);
 const fsReadFile = promisify(fs.readFile);
-const ignoreReg = /^ignore__.*/; // 过滤的文件名后缀
+const ignoreReg = /^ignore__.*/; // 过滤的文件名前缀
 let resourceBaseUrl = '';
 let rootPath = '';
 let id = 1;
 
-const sources = {
-  dirsTree: {
-    dirname: '',
-    children: [],
-    files: [],
-    id: ''
-  },
-  imageList: [],
-  videoList: [],
-  audioList: []
-};
+const sources = [];
 
 const imageReg = /\.(jpg)|(jpeg)|(png)|(gif)/i;
 const videoReg = /\.(mp4)|(ogg)|(webm)/i;
 const audioReg = /\.(mp3)|(ogg)|(wav)/i;
-const FILES_INFO_NAME = 'files_info.json';
-const FILES_STATS_NAME = 'files_stats.json';
+const FILES_INFO_NAME = 'files_info';
+const FILES_STATS_NAME = 'files_stats';
 
-async function getFiles(baseUrl, tree = sources.dirsTree) {
+const files_info_name_list = [];
+const files_stats_name_list = [];
+
+async function getFiles(baseUrl, tree, index) {
   const rootDirName = path.basename(baseUrl);
   tree.dirname = path.basename(rootDirName); // 记录文件夹名称
   tree.id = id++;
@@ -53,7 +46,7 @@ async function getFiles(baseUrl, tree = sources.dirsTree) {
         files: []
       };
       tree.children.push(child);
-      await getFiles(fullName, child);
+      await getFiles(fullName, child, index);
     } else {
       // 否则为文件
       const ext = path.extname(item);
@@ -64,12 +57,13 @@ async function getFiles(baseUrl, tree = sources.dirsTree) {
           dir: rootPath,
           base: '/' + path.relative(resourceBaseUrl, fullName)
         }),
-        alt: item
+        alt: item,
+        sourceIndex: index
       };
       if (imageReg.test(ext)) {
         // 图片
         type = 'image';
-        sources.imageList.push(srcobj);
+        sources[index].imageList.push(srcobj);
         tree.files.push({
           ...srcobj,
           type,
@@ -91,7 +85,7 @@ async function getFiles(baseUrl, tree = sources.dirsTree) {
           }),
           size: stats.size
         };
-        sources.videoList.push(tempObj);
+        sources[index].videoList.push(tempObj);
         tree.files.push({
           ...tempObj,
           type
@@ -99,7 +93,7 @@ async function getFiles(baseUrl, tree = sources.dirsTree) {
       } else if (audioReg.test(ext)) {
         // 音频
         type = 'audio';
-        sources.audioList.push(srcobj);
+        sources[index].audioList.push(srcobj);
         tree.files.push({
           ...srcobj,
           type,
@@ -111,13 +105,13 @@ async function getFiles(baseUrl, tree = sources.dirsTree) {
 }
 
 // 保存文件夹信息
-async function saveInfo(url, obj) {
-  await fsWriteFile(path.join(url, FILES_INFO_NAME), JSON.stringify(obj));
+async function saveInfo(url, obj, index) {
+  await fsWriteFile(path.join(url, files_info_name_list[index]), JSON.stringify(obj));
 }
 
 // 保存修改时间
-async function saveFileStat(url, obj) {
-  await fsWriteFile(path.join(url, FILES_STATS_NAME), JSON.stringify(obj));
+async function saveFileStat(url, obj, index) {
+  await fsWriteFile(path.join(url, files_stats_name_list[index]), JSON.stringify(obj));
 }
 
 // 获取保存的信息
@@ -126,59 +120,84 @@ async function readInfo(url) {
   return JSON.parse(str);
 }
 
-async function refreshFilesInfo(url) {
+async function refreshFilesInfo(url, index) {
   resourceBaseUrl = url;
   console.log('------ start getting files... ------');
-  await getFiles(url);
+  await getFiles(url, sources[index].dirsTree, index);
   console.log('------ got files info successfully ! ------');
-  await saveInfo(__dirname, sources);
+  await saveInfo(__dirname, sources[index], index);
   console.log('------ saved files info successfully ! ------');
 }
 
 // 初始化
-async function init(url, { hasInput = true, host = '/', forceReload = false } = { hasInput: true, host: '/' }) {
+async function init(urls, { hasInput = true, host = '/', forceReload = false } = { hasInput: true, host: '/' }) {
+  for(let index in urls) {
+    files_info_name_list[index] = `${FILES_INFO_NAME}_${index}.json`;
+    files_stats_name_list[index] = `${FILES_STATS_NAME}_${index}.json`;
+    sources[index] = {
+      dirsTree: {
+        dirname: '',
+        children: [],
+        files: [],
+        id: '_' + index + '_'
+      },
+      imageList: [],
+      videoList: [],
+      audioList: []
+    }
+  }
   rootPath = host;
-  let needReloadFiles = false; // 是否需要重新加载文件夹信息
+  const infos = [];
+  for(let index in urls) {
+    const url = urls[index];
 
-  // 判断文件是否被修改
-  try {
-    await fsAccess(path.join(__dirname, FILES_STATS_NAME));
-    const currentStat = await fsStat(url);
-    const oldStat = await readInfo(path.join(__dirname, FILES_STATS_NAME));
+    let needReloadFiles = false; // 是否需要重新加载文件夹信息
 
-    // 文件修改过
-    if (currentStat.ctimeMs === oldStat.ctimeMs) {
-      needReloadFiles = false;
-    } else {
-      await saveFileStat(__dirname, currentStat);
+    // 判断文件是否被修改
+    try {
+      await fsAccess(path.join(__dirname, files_stats_name_list[index]));
+      const currentStat = await fsStat(url);
+      const oldStat = await readInfo(path.join(__dirname, files_stats_name_list[index]));
+
+      // 文件修改过
+      if (currentStat.ctimeMs === oldStat.ctimeMs) {
+        needReloadFiles = false;
+      } else {
+        await saveFileStat(__dirname, currentStat, index);
+        needReloadFiles = true;
+      }
+    } catch (err) {
+      const stat = await fsStat(url);
+      await saveFileStat(__dirname, stat, index);
       needReloadFiles = true;
     }
-  } catch (err) {
-    const stat = await fsStat(url);
-    await saveFileStat(__dirname, stat);
-    needReloadFiles = true;
-  }
 
-  try {
-    await fsAccess(path.join(__dirname, FILES_INFO_NAME));
-    const kw = hasInput ? (await getInputKeywords()).toLowerCase() : 'n';
-    if (kw === 'n' || kw === 'no') {
-      if(forceReload || needReloadFiles) {
-        await refreshFilesInfo(url)
+    try {
+      await fsAccess(path.join(__dirname, files_info_name_list[index]));
+      const kw = hasInput ? (await getInputKeywords()).toLowerCase() : 'n';
+      if (kw === 'n' || kw === 'no') {
+        if(forceReload || needReloadFiles) {
+          await refreshFilesInfo(url, index)
+        } else {
+          const info = await readInfo(path.join(__dirname, files_info_name_list[index]));
+          infos.push(info);
+          continue;
+          // return info;
+        }
       } else {
-        const info = await readInfo(path.join(__dirname, FILES_INFO_NAME));
-        return info;
+        const info = await readInfo(path.join(__dirname, files_info_name_list[index]));
+        // sources.dirsTree = info.dirsTree || {};
+        // sources.imageList = info.imageList || [];
+        // sources.videoList = info.videoList || [];
+        infos.push(info);
+        continue;
+        // return info;
       }
-    } else {
-      const info = await readInfo(path.join(__dirname, FILES_INFO_NAME));
-      // sources.dirsTree = info.dirsTree || {};
-      // sources.imageList = info.imageList || [];
-      // sources.videoList = info.videoList || [];
-      return info;
+    } catch (err) {
+      await refreshFilesInfo(url, index);
     }
-  } catch (err) {
-    await refreshFilesInfo(url);
   }
+  return infos;
 }
 
 async function getInputKeywords() {

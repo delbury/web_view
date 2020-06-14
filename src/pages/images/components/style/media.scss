@@ -22,12 +22,50 @@
   .icon-box {
     position: absolute;
     top: 10vh;
-    right: 1em;
+    padding: 0 1em;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     z-index: 100;
     font-size: 2em;
+    
+    opacity: 1;
+    transition: opacity 200ms;
+
+    .right {
+      i.anticon:not(:first-of-type) {
+        margin-left: 0.75em;
+      }
+    }
+
+    .left {
+      display: flex;
+      align-items: center;
+
+      i:not(:last-of-type) {
+        margin-right: 0.2em;
+      }
+      i.text {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0 5px;
+        height: 1em;
+        border: 2px solid #fff;
+        border-radius: 0.25em;
+
+        span {
+          font-size: 0.5em;
+        }
+      }
+    }
   }
 
-  i.anticon {
-    margin-left: 1em;
+  .fade {
+    opacity: 0;
+  }
+  .hidden {
+    display: none;
   }
 }

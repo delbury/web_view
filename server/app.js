@@ -20,15 +20,17 @@ const ffmpeg = require('./modules/ffmpeg');
 const tools = require('./modules/tools'); // shuffle
 let {
   init,
-  sources: { dirsTree, imageList, videoList, audioList },
+  sources,
   saveFileStat
 } = require('./modules/getFiles');
 const HOST = ''; // 'http://192.168.0.103:4000'
 const INFO_FILES_DIR = path.join(__dirname, './modules');
-const RESOURCE_BASE_DIR = 'F:/资源';
+const RESOURCE_BASE_DIR = 'F:/资源'; // 
 // const RESOURCE_BASE_DIR = __dirname;
 const RESOURCE_DIR_NAME = 'pd';
 const SOURCE_DIR = path.join(RESOURCE_BASE_DIR, '/' + RESOURCE_DIR_NAME);
+// const SOURCE_DIRS = [SOURCE_DIR, 'G:/BaiduNetdiskDownload']; // 全部静态文件夹
+const SOURCE_DIRS = ['G:/github/web_view/server/pd'];
 const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
 const ERROR_LOG_FILE = path.join(__dirname, './modules/error.log')
 
@@ -51,16 +53,20 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
 
 // 主体
 (async () => {
-  const resourceBase = SOURCE_DIR;
   // 获取本地资源列表
-  const localTree = await init(
-    resourceBase,
+  const localTrees = await init(
+    [...SOURCE_DIRS],
     { hasInput: false, host: HOST, forceReload: false }
   );
-  if (localTree) {
-    dirsTree = localTree.dirsTree || {};
-    imageList = localTree.imageList || [];
-    videoList = localTree.videoList || [];
+  const trees = [...localTrees, ...sources];
+
+  if (trees) {
+    // dirsTree = trees[0].dirsTree || {};
+    // imageList = trees[0].imageList || [];
+    // videoList = trees[0].videoList || [];
+
+    imageList = [];
+    videoList = [];
   }
   let randomImages = tools.shuffle(imageList);
   let randomVideos = tools.shuffle(videoList);
@@ -119,13 +125,14 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
         code: 0,
         msg: 'successed',
         // ...tools.getTree(dirsTree, ids)
-        data: [dirsTree]
+        data: [...trees.map(it => it.dirsTree)]
       };
     })
     // 播放视频
-    .get('/play/:path', async ctx => {
+    .get('/play/:path/:sourceIndex', async ctx => {
+      const sourceIndex = ctx.params.sourceIndex;
       const rspath = path.join(
-        SOURCE_DIR,
+        SOURCE_DIRS[sourceIndex],
         decodeURIComponent(ctx.params.path)
       );
       let res = null;
@@ -215,9 +222,10 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
     //   ctx.body = file.slice(start, end + 1);
     // })
     // 获取 poster
-    .get('/poster/:path', async ctx => {
+    .get('/poster/:path/:sourceIndex', async ctx => {
       const rspath = decodeURIComponent(ctx.params.path); // 路由参数路径
-      const fullpath = path.join(SOURCE_DIR, rspath); // 完整资源路径
+      const sourceIndex = ctx.params.sourceIndex;
+      const fullpath = path.join(SOURCE_DIRS[sourceIndex], rspath); // 完整资源路径
       const dirname = path.dirname(fullpath); // 资源所在文件夹
       const md5 = crypto.createHash('md5');
       md5.update(rspath);
@@ -233,7 +241,7 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
           if (res) {
             const posterPath = path.join(dirname, name + '_1.jpg'); // poster 完整路径名
             await fsRename(posterPath, path.join(dirname, name + '.poster'));
-            saveFileStat(INFO_FILES_DIR, await fsStat(resourceBase)); // 更新状态文件
+            saveFileStat(INFO_FILES_DIR, await fsStat(SOURCE_DIRS[sourceIndex]), sourceIndex); // 更新状态文件
           }
         } catch (err) {
           errFlag = true;
@@ -292,8 +300,12 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
         ctx.set('Cache-Control', 'max-age=1800');
       }
       await next();
-    })
-    .use(koaStatic(SOURCE_DIR))
+    });
+  
+  for(let key in SOURCE_DIRS) {
+    app.use(koaStatic(SOURCE_DIRS[key]));
+  }
+  app
     .use(async (ctx, next) => {
       ctx.set('Access-Control-Allow-Origin', "*");
       await next();

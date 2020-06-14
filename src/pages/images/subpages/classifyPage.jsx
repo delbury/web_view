@@ -206,7 +206,7 @@ class ComputedAccordion extends Component {
                                       </div>
                                       <div className="video-item-img">
                                         <img
-                                          src={window.API_BASE_URL + item.posterPath}
+                                          src={window.API_BASE_URL + item.posterPath + `/${item.sourceIndex}`}
                                           alt={item.alt}
                                         />
                                       </div>
@@ -256,7 +256,9 @@ class ClassifyPageImages extends Component {
     super();
     this.state = {
       showVideo: false,
+      showAudio: false,
       video: {},
+      audio: {},
       isLast: false,
       isFirst: false,
       currentVideos: [],
@@ -295,7 +297,7 @@ class ClassifyPageImages extends Component {
   }
 
   // 前一个
-  handleBackwardMedia = () => {
+  handleBackwardMedia = (cb) => {
     if(this.state.currentVideoIndex > 0) {
       const videos = this.state.currentVideos;
       const index = this.state.currentVideoIndex - 1;
@@ -304,12 +306,12 @@ class ClassifyPageImages extends Component {
         isFirst: index === 0,
         isLast: index === videos.length - 1,
         currentVideoIndex: index
-      });
+      }, () => cb && cb());
     } 
   }
 
   // 下一个
-  handleForwardMedia = () => {
+  handleForwardMedia = (cb) => {
     if(this.state.currentVideoIndex < this.state.currentVideos.length - 1) {
       const videos = this.state.currentVideos;
       const index = this.state.currentVideoIndex + 1;
@@ -318,7 +320,7 @@ class ClassifyPageImages extends Component {
         isFirst: index === 0,
         isLast: index === videos.length - 1,
         currentVideoIndex: index
-      });
+      }, () => cb && cb());
     }
   }
 
