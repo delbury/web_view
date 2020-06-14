@@ -29,8 +29,8 @@ const RESOURCE_BASE_DIR = 'F:/资源'; //
 // const RESOURCE_BASE_DIR = __dirname;
 const RESOURCE_DIR_NAME = 'pd';
 const SOURCE_DIR = path.join(RESOURCE_BASE_DIR, '/' + RESOURCE_DIR_NAME);
-// const SOURCE_DIRS = [SOURCE_DIR, 'G:/BaiduNetdiskDownload']; // 全部静态文件夹
-const SOURCE_DIRS = ['G:/github/web_view/server/pd'];
+const SOURCE_DIRS = [SOURCE_DIR, 'G:/BaiduNetdiskDownload']; // 全部静态文件夹
+// const SOURCE_DIRS = ['G:/github/web_view/server/pd'];
 const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
 const ERROR_LOG_FILE = path.join(__dirname, './modules/error.log')
 
@@ -60,16 +60,16 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
   );
   const trees = [...localTrees, ...sources];
 
-  if (trees) {
-    // dirsTree = trees[0].dirsTree || {};
-    // imageList = trees[0].imageList || [];
-    // videoList = trees[0].videoList || [];
+  // if (trees) {
+  //   // dirsTree = trees[0].dirsTree || {};
+  //   // imageList = trees[0].imageList || [];
+  //   // videoList = trees[0].videoList || [];
 
-    imageList = [];
-    videoList = [];
-  }
-  let randomImages = tools.shuffle(imageList);
-  let randomVideos = tools.shuffle(videoList);
+  //   imageList = [];
+  //   videoList = [];
+  // }
+  let randomImages = tools.shuffle(trees.map(it => it.imageList).flat());
+  let randomVideos = tools.shuffle(trees.map(it => it.videoList).flat());
 
   const app = new Koa();
   const router = new Router();
