@@ -13,10 +13,13 @@ export default class PageAudios extends Component {
         onTouchMove={this.handleTouchMove}
         onClick={ev => ev.stopPropagation()}
       >
-        <Icon
-          type="close-circle"
-          onClick={this.props.onClose}
-        />
+        <div className="right-icons">
+          <Icon
+            type="close-circle"
+            onClick={this.props.onClose}
+          />
+        </div>
+        
         <audio
           controls
           playsInline

@@ -12,23 +12,27 @@ const fsReadFile = promisify(fs.readFile);
 const ignoreReg = /^ignore__.*/; // 过滤的文件名前缀
 let resourceBaseUrl = '';
 let rootPath = '';
-let id = 1;
+
 
 const sources = [];
 
 const imageReg = /\.(jpg)|(jpeg)|(png)|(gif)/i;
 const videoReg = /\.(mp4)|(ogg)|(webm)/i;
 const audioReg = /\.(mp3)|(ogg)|(wav)/i;
+const pdfReg = /\.(pdf)/i;
 const FILES_INFO_NAME = 'files_info';
 const FILES_STATS_NAME = 'files_stats';
 
 const files_info_name_list = [];
 const files_stats_name_list = [];
 
+const ids = [];
+
 async function getFiles(baseUrl, tree, index) {
   const rootDirName = path.basename(baseUrl);
   tree.dirname = path.basename(rootDirName); // 记录文件夹名称
-  tree.id = id++;
+  tree.id = `_${index}_${ids[index]}`;
+  ids[index] = (global.BigInt(ids[index]) + 1n).toString();
 
   // 获取文件夹下所有文件
   const files = await fsReaddir(baseUrl);
@@ -99,6 +103,15 @@ async function getFiles(baseUrl, tree, index) {
           type,
           size: stats.size
         });
+      } else if(pdfReg.test(ext)) {
+        // pdf
+        type = 'pdf';
+        sources[index].pdfList.push(srcobj);
+        tree.files.push({
+          ...srcobj,
+          type,
+          size: stats.size
+        });
       }
     }
   }
@@ -122,11 +135,11 @@ async function readInfo(url) {
 
 async function refreshFilesInfo(url, index) {
   resourceBaseUrl = url;
-  console.log('------ start getting files... ------');
+  console.log(`------ ${index}: start getting files... ------`);
   await getFiles(url, sources[index].dirsTree, index);
-  console.log('------ got files info successfully ! ------');
+  console.log(`------ ${index}: got files info successfully ! ------`);
   await saveInfo(__dirname, sources[index], index);
-  console.log('------ saved files info successfully ! ------');
+  console.log(`------ ${index}: saved files info successfully ! ------`);
 }
 
 // 初始化
@@ -139,12 +152,14 @@ async function init(urls, { hasInput = true, host = '/', forceReload = false } =
         dirname: '',
         children: [],
         files: [],
-        id: '_' + index + '_'
+        id: ''
       },
       imageList: [],
       videoList: [],
-      audioList: []
-    }
+      audioList: [],
+      pdfList: []
+    };
+    ids[index] = '0';
   }
   rootPath = host;
   const infos = [];

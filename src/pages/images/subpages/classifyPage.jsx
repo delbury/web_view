@@ -6,6 +6,7 @@ import './style.scss';
 import { setSelectedImagesFolder } from '../../../store/action';
 import Video from '../components/video';
 import Audio from '../components/audio';
+import { openPdf } from '../../../api';
 
 const AccordionPanel = Accordion.Panel;
 const ListItem = List.Item;
@@ -17,12 +18,18 @@ class ComputedAccordion extends Component {
     this.state = {
       hasVideoOpened: false,
       videos: [],
-      hasAudioOpened: false,
-      audios: [],
       showVideo: false,
       video: null,
+
+      hasAudioOpened: false,
+      audios: [],
       showAudio: false,
-      audio: null
+      audio: null,
+      
+      hasPdfOpened: false,
+      pdfs: [],
+      // showPdf: false,
+      // pdf: null
     };
   }
 
@@ -61,20 +68,24 @@ class ComputedAccordion extends Component {
             const images = [];
             const videos = []; 
             const audios = [];
+            const pdfs = [];
             let imagesSize = 0;
             item.files.forEach(it => {
               if(it.type === 'image') {
                 imagesSize += +it.size;
-                images.push(it)
+                images.push(it);
               } else if(it.type === 'video') {
-                videos.push(it)
+                videos.push(it);
               } else if(it.type === 'audio') {
-                audios.push(it)
+                audios.push(it);
+              } else if(it.type === 'pdf') {
+                pdfs.push(it);
               }
             });
             const imagesLen = images.length;
             const videosLen = videos.length;
             const audiosLen = audios.length;
+            const pdfsLen = pdfs.length;
             const isEmpty = !item.files.length && !item.children.length; // 过滤空文件夹
             
             let currentItem = item; // 子文件夹
@@ -84,7 +95,8 @@ class ComputedAccordion extends Component {
             textArr[0] = imagesLen ? `images: ${imagesLen}` : '';
             textArr[1] = videosLen ? `videos: ${videosLen}` : '';
             textArr[2] = audiosLen ? `audios: ${audiosLen}` : '';
-            textArr[3] = currentItem.children.length ? `dirs: ${currentItem.children.length}` : '';
+            textArr[3] = pdfsLen ? `pdfs: ${pdfsLen}` : '';
+            textArr[4] = currentItem.children.length ? `dirs: ${currentItem.children.length}` : '';
             const subTitle = textArr.filter(item => item).join(', ');
             return (
               !isEmpty ? <AccordionPanel
@@ -220,6 +232,52 @@ class ComputedAccordion extends Component {
                       </Accordion>
                     ) : ''
                   }
+                  {
+                    pdfsLen ?
+                    (
+                      <Accordion accordion onChange={ev => {
+                        if(ev === undefined) {
+                          this.setState({ hasPdfOpened: false });
+                          window.setTimeout(() => {
+                            this.setState({ pdfs: [] });
+                          }, 220);
+                        } else {
+                          this.setState({ hasPdfOpened: true, pdfs });
+                        }
+                      }}>
+                        <AccordionPanel
+                          header={`${str}PDFs: ${pdfsLen}`}
+                          className="accordion-pdflist"
+                        >
+                          {
+                            <List style={listStyle}>
+                              {
+                                this.state.pdfs.map((item, index) => (
+                                  <ListItem
+                                    className="pdf-item"
+                                    key={index}
+                                    onClick={() => props.onClickPdfs(item)}
+                                  >
+                                    <div className="pdf-item-info">
+                                      <div className="accordion-dirlist-header">
+                                        <div className="accordion-dirlist-header-title">
+                                          <span>{item.alt}</span>
+                                        </div>
+                                        <div className="accordion-dirlist-header-sub">
+                                          {`size: ${this.sizeFormatter(item.size)}`}
+                                        </div>
+                                      </div>
+                                      <Icon type="play-circle" />
+                                    </div>
+                                  </ListItem>
+                                ))
+                              }
+                            </List>
+                          }
+                        </AccordionPanel>
+                      </Accordion>
+                    ) : ''
+                  }
                 </List>
                 {
                   item.children.length !== 0 ? (
@@ -229,6 +287,7 @@ class ComputedAccordion extends Component {
                       onClickImages={props.onClickImages}
                       onClickVideos={props.onClickVideos}
                       onClickAudios={props.onClickAudios}
+                      onClickPdfs={props.onClickPdfs}
                     />
                   ) : ''
                 }
@@ -296,6 +355,11 @@ class ClassifyPageImages extends Component {
     });
   }
 
+  // 点击pdf文件夹
+  handleClickPdfsDir = ev => {
+    openPdf(ev.src);
+  }
+
   // 前一个
   handleBackwardMedia = (cb) => {
     if(this.state.currentVideoIndex > 0) {
@@ -356,6 +420,7 @@ class ClassifyPageImages extends Component {
                 onClickImages={this.handleClickImagesDir}
                 onClickVideos={this.handleClickVideosDir}
                 onClickAudios={this.handleClickAudiosDir}
+                onClickPdfs={this.handleClickPdfsDir}
               />
             </Flex>
         }

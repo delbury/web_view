@@ -15,6 +15,7 @@ const fsStat = promisify(fs.stat);
 const fsWriteFile = promisify(fs.writeFile);
 
 const crypto = require('crypto');
+const winattr = require('winattr');
 
 const ffmpeg = require('./modules/ffmpeg');
 const tools = require('./modules/tools'); // shuffle
@@ -23,16 +24,16 @@ let {
   sources,
   saveFileStat
 } = require('./modules/getFiles');
-const HOST = ''; // 'http://192.168.0.103:4000'
-const INFO_FILES_DIR = path.join(__dirname, './modules');
-const RESOURCE_BASE_DIR = 'F:/资源'; // 
-// const RESOURCE_BASE_DIR = __dirname;
-const RESOURCE_DIR_NAME = 'pd';
-const SOURCE_DIR = path.join(RESOURCE_BASE_DIR, '/' + RESOURCE_DIR_NAME);
-const SOURCE_DIRS = [SOURCE_DIR, 'G:/BaiduNetdiskDownload']; // 全部静态文件夹
-// const SOURCE_DIRS = ['G:/github/web_view/server/pd'];
-const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
-const ERROR_LOG_FILE = path.join(__dirname, './modules/error.log')
+const {
+  HOST,
+  INFO_FILES_DIR,
+  RESOURCE_BASE_DIR,
+  RESOURCE_DIR_NAME,
+  SOURCE_DIR,
+  SOURCE_DIRS,
+  excludeErrorCodes,
+  ERROR_LOG_FILE,
+} = require('./config');
 
 // 记录log
 async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
@@ -58,7 +59,7 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
     [...SOURCE_DIRS],
     { hasInput: false, host: HOST, forceReload: false }
   );
-  const trees = [...localTrees, ...sources];
+  const trees = localTrees.length ? localTrees : sources;
 
   // if (trees) {
   //   // dirsTree = trees[0].dirsTree || {};
@@ -68,8 +69,9 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
   //   imageList = [];
   //   videoList = [];
   // }
-  let randomImages = tools.shuffle(trees.map(it => it.imageList).flat());
-  let randomVideos = tools.shuffle(trees.map(it => it.videoList).flat());
+  let randomImages = tools.shuffle(Array.prototype.concat.apply([], trees.map(it => it.imageList)));
+  let randomVideos = tools.shuffle(Array.prototype.concat.apply([], trees.map(it => it.videoList)));
+  let randomAudios = tools.shuffle(Array.prototype.concat.apply([], trees.map(it => it.audioList)));
 
   const app = new Koa();
   const router = new Router();
@@ -77,7 +79,7 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
   router
     // 重新随机排列照片
     .post('/images/shuffle', async ctx => {
-      randomImages = tools.shuffle(imageList);
+      randomImages = tools.shuffle(randomImages);
       ctx.body = {
         code: 0,
         msg: 'successed',
@@ -97,7 +99,7 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
       ctx.body = {
         code: 0,
         msg: 'successed',
-        ...tools.eachRandomResource(ctx, audioList)
+        ...tools.eachRandomResource(ctx, randomAudios)
       };
     })
     // 随机图片
@@ -240,7 +242,11 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
           const res = await ffmpeg.getVideoSceenshots(fullpath, dirname, name);
           if (res) {
             const posterPath = path.join(dirname, name + '_1.jpg'); // poster 完整路径名
-            await fsRename(posterPath, path.join(dirname, name + '.poster'));
+            const rePath = path.join(dirname, name + '.poster');
+            await fsRename(posterPath, rePath);
+            await new Promise(resolve => {
+              winattr.set(rePath, { hidden: true }, () => resolve());
+            });
             saveFileStat(INFO_FILES_DIR, await fsStat(SOURCE_DIRS[sourceIndex]), sourceIndex); // 更新状态文件
           }
         } catch (err) {
@@ -301,8 +307,8 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
       }
       await next();
     });
-  
-  for(let key in SOURCE_DIRS) {
+
+  for (let key in SOURCE_DIRS) {
     app.use(koaStatic(SOURCE_DIRS[key]));
   }
   app
@@ -317,3 +323,7 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
     console.log('Server started successfully!');
   });
 })();
+
+module.exports = {
+  SOURCE_DIRS
+}

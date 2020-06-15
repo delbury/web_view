@@ -12,7 +12,7 @@ export default class PageVideos extends Component {
       timer: null
     };
 
-    this.rateList = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0];
+    this.rateList = [1.0, 1.5, 2.0];
   }
 
   handleTouchMove = ev => {

@@ -14,9 +14,30 @@
   z-index: 99;
   // pointer-events: none;
 
-  audio, video {
+  video {
     max-width: 100%;
     max-height: 100%;
+  }
+  audio {
+    box-sizing: border-box;
+    margin: 0 1em;
+    width: 100%;
+  }
+
+  .right-icons {
+    position: absolute;
+    top: 10vh;
+    padding: 0 1em;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    z-index: 100;
+    font-size: 2em;
+
+    i.anticon:not(:first-of-type) {
+      margin-left: 0.75em;
+    }
   }
 
   .icon-box {

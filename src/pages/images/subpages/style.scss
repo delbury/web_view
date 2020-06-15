@@ -10,6 +10,10 @@ $audio-header-color: #d46b08;
 $audio-item-color: #ffa940;
 
 $image-header-color: #a8071a;
+
+$pdf-header-color: #9e1068;
+$pdf-item-color: #eb2f96;
+
 $empty-header-color: #bfbfbf;
 
 .image-classify {
@@ -43,6 +47,9 @@ $empty-header-color: #bfbfbf;
       }
       & .accordion-audiolist .am-accordion-header {
         background-color: $audio-header-color;
+      }
+      & .accordion-pdflist .am-accordion-header {
+        background-color: $pdf-header-color;
       }
 
       .am-accordion-content {
@@ -115,6 +122,18 @@ $empty-header-color: #bfbfbf;
       background-color: $audio-item-color;
 
       .audio-item-info {
+        height: 100%;
+        padding-right: 25px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+
+    &.pdf-item {
+      background-color: $pdf-item-color;
+
+      .pdf-item-info {
         height: 100%;
         padding-right: 25px;
         overflow: hidden;
