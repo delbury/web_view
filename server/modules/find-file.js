@@ -10,7 +10,8 @@ const fsStat = promisify(fs.stat);
 const { cloneDeep } = require('lodash');
 // const fsAccess = promisify(fs.access);
 const fileReg = /\.(avi|mkv|rm|rmvb|3gp|mov|flv|ts|wmv|zip|rar|7z)/i;
-const ROOT_DIR = 'F:/资源'; // path.resolve(__dirname, '../pd').replace(/\\/g, '/');
+// const ROOT_DIR = 'F:/资源'; // path.resolve(__dirname, '../pd').replace(/\\/g, '/');
+const ROOT_DIR = 'G:/BaiduNetdiskDownload'
 const TREE_NODE = {
   children: null,
   matchedFiles: null,
@@ -34,8 +35,9 @@ async function main() {
 }
 
 // 读取文件夹
+const reg = /^ignore__/;
 async function readFile(dir, tree) {
-  const files = await fsReaddir(dir);
+  const files = (await fsReaddir(dir)).filter(file => !reg.test(file));
   tree.dirPath = dir;
   tree.baseName = path.basename(dir);
 
