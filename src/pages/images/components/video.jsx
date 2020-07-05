@@ -31,6 +31,11 @@ export default class PageVideos extends Component {
   componentDidMount() {
     const video = this.refs.video;
 
+    // 播放事件
+    video.onplaying = ev => {
+      this.onRotate(0);
+    }
+
     // 可以播放
     video.oncanplay = ev => {
       video.playbackRate = this.rateList[this.state.rateIndex];
@@ -106,22 +111,14 @@ export default class PageVideos extends Component {
   }
 
   // 旋转
-  onRotate(clockwise = true) {
+  onRotate(rotateDeg = 0) {
     const video = this.refs.video;
     const { clientWidth, clientHeight } = video;
     const rotate = this.state.videoStyle.rotate;
-    let deg = rotate;
+    const deg = (rotate + rotateDeg + 360) % 360;
     let scale = null;
     let maxWidth = '';
     let maxHeight = '';
-
-    if(clockwise) {
-      // 顺时针
-      deg = (rotate + 90 + 360) % 360;
-    } else {
-      // 逆时针
-      deg = (rotate - 90 + 360) % 360;
-    }
 
     if((deg % 180) !== 0) {
       const scaleW = (document.documentElement.offsetWidth || document.body.offsetWidth) / clientHeight;
@@ -236,7 +233,7 @@ export default class PageVideos extends Component {
               type="left-circle"
               onClick={() => {
                 if(!isFirst) {
-                  this.props.onBackward();
+                  // this.props.onBackward();
                   this.props.onBackward(() => {
                     if(!this.state.paused) {
                       this.refs.video.play();
@@ -251,7 +248,7 @@ export default class PageVideos extends Component {
               type="right-circle"
               onClick={() => {
                 if(!isLast) {
-                  this.props.onForward();
+                  // this.props.onForward();
                   this.props.onForward(() => {
                     if(!this.state.paused) {
                       this.refs.video.play();
@@ -297,14 +294,14 @@ export default class PageVideos extends Component {
               {/* 顺时针 */}
               <Icon type="redo" 
                 onClick={() => {
-                  this.onRotate(true);
+                  this.onRotate(90);
                 }}
               />
 
               {/* 逆时针 */}
               <Icon type="undo" 
                 onClick={() => {
-                  this.onRotate(false);
+                  this.onRotate(-90);
                 }}
               />
             </div>
