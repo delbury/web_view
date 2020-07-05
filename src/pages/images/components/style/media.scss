@@ -45,16 +45,25 @@
     top: 10vh;
     padding: 0 1em;
     width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     z-index: 100;
     font-size: 2em;
     
     opacity: 1;
     transition: opacity 200ms;
 
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      &:not(:last-of-type) {
+        margin-bottom: 0.5em;
+      }
+    }
+
     .right {
+      display: flex;
+
       i.anticon:not(:first-of-type) {
         margin-left: 0.75em;
       }

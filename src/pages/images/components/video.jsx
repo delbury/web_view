@@ -9,7 +9,14 @@ export default class PageVideos extends Component {
       paused: true,
       rateIndex: 0,
       showCtrls: true,
-      timer: null
+      timer: null,
+      videoStyle: {
+        rotate: 0,
+        width: '',
+        height: '',
+        maxWidth: '',
+        maxHeight: ''
+      }
     };
 
     this.rateList = [1.0, 1.5, 2.0];
@@ -57,6 +64,47 @@ export default class PageVideos extends Component {
     });
   }
 
+  // 旋转
+  onRotate(clockwise = true) {
+    const video = this.refs.video;
+    const { clientWidth, clientHeight } = video;
+    const rotate = this.state.videoStyle.rotate;
+    let deg = rotate;
+    let scale = null;
+    let maxWidth = '';
+    let maxHeight = '';
+
+    if(clockwise) {
+      // 顺时针
+      deg = (rotate + 90) % 360;
+    } else {
+      // 逆时针
+      deg = (rotate - 90) % 360;
+    }
+
+    if((deg % 180) !== 0) {
+      const scaleW = (document.documentElement.offsetWidth || document.body.offsetWidth) / clientHeight;
+      const scaleH = (document.documentElement.offsetHeight || document.body.offsetHeight) / clientWidth;
+      scale = Math.min(scaleW, scaleH);
+      maxWidth = 'unset';
+      maxHeight = 'unset';
+    } else {
+      maxWidth = '';
+      maxHeight = '';
+    }
+
+    // 更新
+    this.setState({
+      videoStyle: {
+        rotate: deg,
+        height: scale ? `${clientHeight * scale}px` : '',
+        width: scale ? `${clientWidth * scale}px` : '',
+        maxWidth,
+        maxHeight
+      }
+    })
+  }
+
   // 设置定时器
   refreshTimer(ele) {
     ele.classList.remove('hidden');
@@ -91,6 +139,7 @@ export default class PageVideos extends Component {
     const { video, isFirst, isLast } = this.props;
     const paused = this.state.paused;
     const rateIndex = this.state.rateIndex;
+    const { width, height, rotate, maxWidth, maxHeight } = this.state.videoStyle;
     return (
       <div
         className="mediabox"
@@ -100,40 +149,41 @@ export default class PageVideos extends Component {
         onTouchStart={ev => this.refreshTimer(this.refs.toolbar)}
       >
         <div ref="toolbar" className={`icon-box ${this.state.showCtrls ? '' : 'hidden'}`}>
-          <div className="left">
-            <Icon
-              type="minus-circle"
-              onClick={() => {
-                if(rateIndex > 0) {
-                  this.refs.video.playbackRate = this.rateList[rateIndex - 1]
-                  this.setState({ rateIndex: rateIndex - 1 });
-                }
-              }}
-              style={{color: rateIndex > 0 ? '' : 'grey'}}
-            />
-            <i className="text"
-              onClick={() => {
-                const tempIndex = this.state.rateIndex + 1;
-                if(tempIndex >= this.rateList.length) {
-                  this.refs.video && (this.refs.video.playbackRate = this.rateList[0])
-                  this.setState({ rateIndex: 0 });
-                } else {
-                  
-                }
-              }}
-            ><span>x{this.rateList[rateIndex].toFixed(1)}</span></i>
-            <Icon
-              type="plus-circle"
-              onClick={() => {
-                if(rateIndex < this.rateList.length - 1) {
-                  this.refs.video.playbackRate = this.rateList[rateIndex + 1]
-                  this.setState({ rateIndex: rateIndex + 1 });
-                }
-              }}
-              style={{color: rateIndex < this.rateList.length - 1 ? '' : 'grey'}}
-            />
-          </div>
-          <div className="right">
+          <div className="row">
+            <div className="left">
+              <Icon
+                type="minus-circle"
+                onClick={() => {
+                  if(rateIndex > 0) {
+                    this.refs.video.playbackRate = this.rateList[rateIndex - 1]
+                    this.setState({ rateIndex: rateIndex - 1 });
+                  }
+                }}
+                style={{color: rateIndex > 0 ? '' : 'grey'}}
+              />
+              <i className="text"
+                onClick={() => {
+                  const tempIndex = this.state.rateIndex + 1;
+                  if(tempIndex >= this.rateList.length) {
+                    this.refs.video && (this.refs.video.playbackRate = this.rateList[0])
+                    this.setState({ rateIndex: 0 });
+                  } else {
+                    
+                  }
+                }}
+              ><span>x{this.rateList[rateIndex].toFixed(1)}</span></i>
+              <Icon
+                type="plus-circle"
+                onClick={() => {
+                  if(rateIndex < this.rateList.length - 1) {
+                    this.refs.video.playbackRate = this.rateList[rateIndex + 1]
+                    this.setState({ rateIndex: rateIndex + 1 });
+                  }
+                }}
+                style={{color: rateIndex < this.rateList.length - 1 ? '' : 'grey'}}
+              />
+            </div>
+            <div className="right">
             {/* <Icon
               type="fullscreen"
               onClick={() => {
@@ -184,8 +234,38 @@ export default class PageVideos extends Component {
             }
             <Icon
               type="close-circle"
-              onClick={this.props.onClose}
+              onClick={() => {
+                this.setState({
+                  videoStyle: {
+                    rotate: 0,
+                    width: '',
+                    height: '',
+                    maxWidth: '',
+                    maxHeight: ''
+                  }
+                });
+                this.props.onClose();
+              }}
             />
+          </div>
+          </div>
+          <div className="row">
+            <div className="left"></div>
+            <div className="right">
+              {/* 顺时针 */}
+              <Icon type="redo" 
+                onClick={() => {
+                  this.onRotate(true);
+                }}
+              />
+
+              {/* 逆时针 */}
+              <Icon type="undo" 
+                onClick={() => {
+                  this.onRotate(false);
+                }}
+              />
+            </div>
           </div>
         </div>
         
@@ -197,6 +277,13 @@ export default class PageVideos extends Component {
           type="video/mp4"
           preload="metadata"
           ref="video"
+          style={{
+            transform: `rotate(${rotate}deg)`,
+            width,
+            height,
+            maxWidth,
+            maxHeight
+          }}
         ></video>
       </div>
     );
