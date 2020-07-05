@@ -32,9 +32,10 @@ export default class PageVideos extends Component {
     const video = this.refs.video;
 
     // 播放事件
-    video.onplaying = ev => {
-      this.onRotate(0);
-    }
+    // video.onplaying = ev => {
+      // console.log('playing.....')
+      // this.onRotate(0);
+    // }
 
     // 可以播放
     video.oncanplay = ev => {
@@ -121,9 +122,16 @@ export default class PageVideos extends Component {
     let maxHeight = '';
 
     if((deg % 180) !== 0) {
-      const scaleW = (document.documentElement.offsetWidth || document.body.offsetWidth) / clientHeight;
-      const scaleH = (document.documentElement.offsetHeight || document.body.offsetHeight) / clientWidth;
-      scale = Math.min(scaleW, scaleH);
+      if(rotateDeg === 0) {
+        const scaleW = (document.documentElement.offsetWidth || document.body.offsetWidth) / clientWidth;
+        const scaleH = (document.documentElement.offsetHeight || document.body.offsetHeight) / clientHeight;
+        scale = Math.min(scaleW, scaleH);
+      } else {
+        const scaleW = (document.documentElement.offsetWidth || document.body.offsetWidth) / clientHeight;
+        const scaleH = (document.documentElement.offsetHeight || document.body.offsetHeight) / clientWidth;
+        scale = Math.min(scaleW, scaleH);
+      }
+      
       maxWidth = 'unset';
       maxHeight = 'unset';
     } else {
@@ -131,12 +139,19 @@ export default class PageVideos extends Component {
       maxHeight = '';
     }
 
+    const obj = rotateDeg === 0 ? {
+      height: scale ? `${clientWidth * scale}px` : '',
+      width: scale ? `${clientHeight * scale}px` : '',
+    } : {
+      height: scale ? `${clientHeight * scale}px` : '',
+      width: scale ? `${clientWidth * scale}px` : '',
+    }
+
     // 更新
     this.setState({
       videoStyle: {
         rotate: deg,
-        height: scale ? `${clientHeight * scale}px` : '',
-        width: scale ? `${clientWidth * scale}px` : '',
+        ...obj,
         maxWidth,
         maxHeight
       }
@@ -162,6 +177,19 @@ export default class PageVideos extends Component {
         };
         this.setState({ timer: null });
       }, 3000)
+    });
+  }
+
+  // 重置video样式
+  resetVideo() {
+    this.setState({
+      videoStyle: {
+        rotate: 0,
+        width: '',
+        height: '',
+        maxWidth: '',
+        maxHeight: ''
+      }
     });
   }
 
@@ -239,6 +267,7 @@ export default class PageVideos extends Component {
                       this.refs.video.play();
                     }
                   });
+                  this.resetVideo();
                   // this.setState({ paused: true });
                 }
               }}
@@ -254,6 +283,7 @@ export default class PageVideos extends Component {
                       this.refs.video.play();
                     }
                   });
+                  this.resetVideo();
                   // this.setState({ paused: true });
                 }
               }}
@@ -274,15 +304,8 @@ export default class PageVideos extends Component {
             <Icon
               type="close-circle"
               onClick={() => {
-                this.setState({
-                  videoStyle: {
-                    rotate: 0,
-                    width: '',
-                    height: '',
-                    maxWidth: '',
-                    maxHeight: ''
-                  }
-                });
+                this.refs.video && this.refs.video.pause();
+                this.resetVideo();
                 this.props.onClose();
               }}
             />
