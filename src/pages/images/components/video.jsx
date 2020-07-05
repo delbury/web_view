@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Icon } from 'antd';
 import './style/media.scss';
+import { timeToString } from '../../../libs/util';
 
 export default class PageVideos extends Component {
   constructor() {
@@ -16,7 +17,8 @@ export default class PageVideos extends Component {
         height: '',
         maxWidth: '',
         maxHeight: ''
-      }
+      },
+      toastMsg: ''
     };
 
     this.rateList = [1.0, 1.5, 2.0];
@@ -57,6 +59,45 @@ export default class PageVideos extends Component {
       this.setState({ paused: true });
     };
 
+    // 开始拖动
+    video.ontouchstart = ev => {
+      if(this.state.videoStyle.rotate === 0 || this.state.videoStyle.rotate === 180) {
+        this._startTouce = ev.touches[0].clientX;
+      } else {
+        this._startTouce = ev.touches[0].clientY;
+      }
+    }
+
+    // 拖动中
+    video.ontouchmove = ev => {
+      const step = 3;
+      if(this.state.videoStyle.rotate === 0) {
+        this._offsetTouce = (ev.touches[0].clientX - this._startTouce) / step;
+      } else if(this.state.videoStyle.rotate === 180) {
+        this._offsetTouce = -(ev.touches[0].clientX - this._startTouce) / step;
+      } else if(this.state.videoStyle.rotate === 90) {
+        this._offsetTouce = (ev.touches[0].clientY - this._startTouce) / step;
+      } else if(this.state.videoStyle.rotate === 270) {
+        this._offsetTouce = -(ev.touches[0].clientY - this._startTouce) / step;
+      }
+
+      this.setState({
+        toastMsg: `${timeToString(this._offsetTouce)}`
+      });
+    }
+
+    // 拖动结束
+    video.ontouchend = ev => {
+      this.setState({
+        toastMsg: ''
+      });
+      if(this._offsetTouce) {
+        this.refs.video.currentTime += this._offsetTouce;
+        this._startTouce = null;
+        this._offsetTouce = null;
+      }
+    }
+
     this.refreshTimer(this.refs.toolbar);
 
     this.setState({
@@ -76,10 +117,10 @@ export default class PageVideos extends Component {
 
     if(clockwise) {
       // 顺时针
-      deg = (rotate + 90) % 360;
+      deg = (rotate + 90 + 360) % 360;
     } else {
       // 逆时针
-      deg = (rotate - 90) % 360;
+      deg = (rotate - 90 + 360) % 360;
     }
 
     if((deg % 180) !== 0) {
@@ -140,6 +181,7 @@ export default class PageVideos extends Component {
     const paused = this.state.paused;
     const rateIndex = this.state.rateIndex;
     const { width, height, rotate, maxWidth, maxHeight } = this.state.videoStyle;
+    const toastMsg = this.state.toastMsg;
     return (
       <div
         className="mediabox"
@@ -285,6 +327,14 @@ export default class PageVideos extends Component {
             maxHeight
           }}
         ></video>
+        {
+          !!toastMsg ?
+            <div className="toast" style={{
+              transform: `rotate(${rotate}deg)`,
+            }}>
+              { toastMsg }
+            </div>: ''
+        }
       </div>
     );
   }

@@ -98,4 +98,12 @@
   .hidden {
     display: none;
   }
+
+  .toast {
+    position: absolute;
+    padding: 5px 10px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    border-radius: 5px;
+  }
 }

@@ -26,3 +26,15 @@ export function preventPullToRefresh(element) {
       }
     });
 };
+
+// 时间转换
+export function timeToString(time) {
+  const sym = time > 0 ? '+' : '-';
+  time = Math.abs(Math.round(+time));
+  const seconds = time % 60 || 0;
+  const rest = (time - seconds) / 60;
+  const minutes = rest % 60 || 0;
+  const hours = (rest - minutes) / 60 || 0;
+  const fn = num => num.toString().padStart(2, '0');
+  return `${sym} ${fn(hours)}:${fn(minutes)}:${fn(seconds)}`;
+}
