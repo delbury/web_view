@@ -22,10 +22,7 @@ export default class PageVideos extends Component {
     };
 
     this.rateList = [1.0, 1.5, 2.0];
-  }
-
-  handleTouchMove = ev => {
-    ev.stopPropagation();
+    this._dblclickTimer = null;
   }
 
   componentDidMount() {
@@ -67,12 +64,32 @@ export default class PageVideos extends Component {
 
     // 开始拖动
     video.ontouchstart = ev => {
+      // 双击切换播放状态
+      if(this._dblclickTimer) {
+        clearTimeout(this._dblclickTimer);
+        this._dblclickTimer = null;
+
+        if(this.state.paused) {
+          video.play();
+        } else {
+          video.pause();
+        }
+
+        ev.preventDefault();
+        return;
+      } else {
+        this._dblclickTimer = setTimeout(() => {
+          this._dblclickTimer = null;
+        }, 300)
+      }
+
+      // 开始拖动快进
       if(this.state.videoStyle.rotate === 0 || this.state.videoStyle.rotate === 180) {
         this._startTouce = ev.touches[0].clientX;
       } else {
         this._startTouce = ev.touches[0].clientY;
       }
-    }
+    };
 
     // 拖动中
     video.ontouchmove = ev => {
@@ -90,7 +107,7 @@ export default class PageVideos extends Component {
       this.setState({
         toastMsg: `${timeToString(this._offsetTouce)}`
       });
-    }
+    };
 
     // 拖动结束
     video.ontouchend = ev => {
@@ -102,13 +119,18 @@ export default class PageVideos extends Component {
         this._startTouce = null;
         this._offsetTouce = null;
       }
-    }
+    };
 
     this.refreshTimer(this.refs.toolbar);
 
     this.setState({
       paused: video.paused
     });
+
+    this.refs.mediabox.addEventListener('touchmove', ev => {
+      ev.stopPropagation();
+      ev.preventDefault();
+    })
   }
 
   // 旋转
@@ -210,7 +232,7 @@ export default class PageVideos extends Component {
     return (
       <div
         className="mediabox"
-        onTouchMove={this.handleTouchMove}
+        ref="mediabox"
         onClick={ev => ev.stopPropagation()}
         onMouseMove={ev => this.refreshTimer(this.refs.toolbar)}
         onTouchStart={ev => this.refreshTimer(this.refs.toolbar)}
@@ -332,13 +354,13 @@ export default class PageVideos extends Component {
         </div>
         
         <video
+          ref="video"
           poster={window.API_BASE_URL + video.posterPath + `/${video.sourceIndex}`}
           controls
           playsInline
           src={window.API_BASE_URL + video.sourcrPath + `/${video.sourceIndex}`}
           type="video/mp4"
           preload="metadata"
-          ref="video"
           style={{
             transform: `rotate(${rotate}deg)`,
             width,

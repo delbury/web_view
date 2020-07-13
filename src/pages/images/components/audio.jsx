@@ -5,12 +5,22 @@ import './style/media.scss';
 export default class PageAudios extends Component {
   handleTouchMove = ev => {
     ev.stopPropagation();
+    ev.preventDefault();
   }
+
+  componentDidMount() {
+    this.refs.mediabox.addEventListener('touchmove', ev => {
+      ev.stopPropagation();
+      ev.preventDefault();
+    })
+  }
+
   render() {
     const audio = this.props.audio;
     return (
-      <div className="mediabox"
-        onTouchMove={this.handleTouchMove}
+      <div 
+        className="mediabox"
+        ref="mediabox"
         onClick={ev => ev.stopPropagation()}
       >
         <div className="right-icons">

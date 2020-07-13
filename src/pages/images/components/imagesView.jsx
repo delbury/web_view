@@ -5,6 +5,7 @@ import './style/image.scss';
 import Hammer from 'hammerjs';
 // import Zmage from 'react-zmage';
 import { preventPullToRefresh } from '../../../libs/util';
+import ReactDOM from 'react-dom';
 
 export default class ImagesView extends Component {
   constructor() {
@@ -22,13 +23,16 @@ export default class ImagesView extends Component {
       isSpan: false,
       spanDir: 0, // 0, 90, -90
       frozen: false,
-      draggable: false,
-      scalable: false,
-      spinable: true,
-      switchable: true
+      draggable: false, // 拖动
+      scalable: false, // 缩放
+      spinable: false, // 按压旋转
+      switchable: true, // 前一页后一页
+      rotatable: true, // 双指旋转
     };
     this.iv = null;
   }
+
+  // 旋转照片
   spinImage = deg => {
     if(deg === 0) {
       this.setState({
@@ -42,26 +46,21 @@ export default class ImagesView extends Component {
       });
     }
   }
+
+  // 改变照片
   changeImage = type => {
     const ev = (type < 0) ? 'next' : 'prev';
     this.props.onChangeImage(ev);
   }
   
-  componentWillMount() {
-    // this.spinImage(90);
-  }
   componentDidMount() {
     // document.body.style.overflow = 'hidden';
 
     this.iv = this.refs.imageview;
-    this.iv.onload = ev => {
-      const { width, height } = this.iv;
-      if(width > height) {
-        this.spinImage(90);
-      } else {
-        this.spinImage(0);
-      }
+    ReactDOM.findDOMNode(this.refs.imageviewBox).ontouchmove = ev => {
+      ev.preventDefault();
     };
+    
     preventPullToRefresh(this.iv);
     this.hammer = new Hammer(this.iv);
 
@@ -69,23 +68,32 @@ export default class ImagesView extends Component {
     if(this.state.switchable) {
       this.hammer.on('panstart', ev => {
         if(this.state.frozen) return;
+        const { spanDir } = this.state;
         const { deltaX: ox } = ev;
+
         const fnMove = ev => {
           const { deltaX } = ev;
           const dx = deltaX - ox;
-          
+
+          this.refs.imageview.style.transform = `translateX(${dx}px) rotate(${spanDir}deg)`;
+        }
+
+        const fnEnd = ev => {
+          const { deltaX } = ev;
+          const dx = deltaX - ox;
           if(Math.abs(dx) > 50) {
             this.changeImage(dx);
-            this.hammer.off('panmove', fnMove);
             this.hammer.off('panend', fnEnd);
           }
-        }
-        const fnEnd = ev => {
-          this.hammer.off('panmove', fnMove);
+          
           this.hammer.off('panend', fnEnd);
+          this.hammer.off('panmove', fnMove)
+
+          this.refs.imageview.style.transform = `rotate(${spanDir}deg)`;
         }
-        this.hammer.on('panmove', fnMove);
         this.hammer.on('panend', fnEnd);
+        this.hammer.on('panmove', fnMove)
+
       });
     }
     // 前一页后一页结束
@@ -141,7 +149,7 @@ export default class ImagesView extends Component {
     }
     // 拖动结束
 
-    // 旋转
+    // 按压旋转
     if(this.state.spinable) {
       this.hammer.get('pan').set({ direction: Hammer.DIRECTION_ALL });
       this.hammer.on('press', ev => {
@@ -171,6 +179,40 @@ export default class ImagesView extends Component {
       });
     }
     // 旋转结束
+
+    // 双指旋转开始
+    if(this.state.rotatable) {
+      this.hammer.get('rotate').set({ enable: true });
+      this.hammer.on('rotatestart', ev => {
+        const { spanDir } = this.state;
+        const oDeg = ev.rotation;
+
+        const fnMove = ev => {
+          const dDeg = ev.rotation - oDeg;
+
+          this.refs.imageview.style.transform = `rotate(${spanDir + dDeg}deg)`;
+        };
+        const fnEnd = ev => {
+          const dDeg = ev.rotation - oDeg;
+          this.hammer.off('rotatemove', fnMove);
+          this.hammer.off('rotateend', fnEnd);
+
+          let deg = spanDir;
+          if(dDeg > 45 && spanDir < 90) {
+            deg = spanDir + 90
+          } else if(dDeg < -45 && spanDir > -90) {
+            deg = spanDir - 90
+
+          }
+          this.spinImage(deg)
+          this.refs.imageview.style.transform = `rotate(${deg}deg)`;
+        };
+
+        this.hammer.on('rotatemove', fnMove);
+        this.hammer.on('rotateend', fnEnd)
+      });
+    }
+    // 双指旋转结束
   }
   componentWillUnmount() {
     this.hammer = null;
@@ -182,20 +224,18 @@ export default class ImagesView extends Component {
   
   render() {
     const { imgs: IMGS, index } = this.props;
-    const { width, height, isSpan, spanDir, frozen } = this.state;
+    const { isSpan, spanDir, frozen } = this.state;
     const style = {
-      left: isSpan ? '50%' : '',
-      top: isSpan ? '50%' : '',
-      maxWidth: isSpan ? height : width,
-      maxHeight: isSpan ? width : height,
-      transform: isSpan ?　`translate(-50%, -50%) rotate(${spanDir}deg)` : `rotate(${spanDir}deg)`
+      maxWidth: isSpan ? '100vh': '100vw',
+      maxHeight: isSpan ? '100vw': '100vh',
+      transform: `rotate(${spanDir}deg)`,
     };
     return (
-      <Flex className="imageview" onClick={this.props.onClick}>
+      <Flex ref="imageviewBox" className="imageview" onClick={this.props.onClick}>
         <Icon type="retweet" className={`icon ${frozen ? 'show' : ''}`} />
         <img
-          style={style}
           className="img-normal"
+          style={style}
           src={window.API_BASE_URL + IMGS[index].src}
           alt={IMGS[index].alt}
           onClick={this.props.onClick}

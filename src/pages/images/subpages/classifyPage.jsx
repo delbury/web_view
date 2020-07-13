@@ -335,9 +335,9 @@ class ClassifyPageImages extends Component {
 
   // 点击视频header
   handleClickVideosDir = (video, index, arr) => {
-    document.documentElement.style.overflow = 'hidden';
+    // document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
-    document.body.style.position = 'fixed';
+    // document.body.style.position = 'fixed';
     this.setState({
       video,
       showVideo: true,
@@ -350,9 +350,9 @@ class ClassifyPageImages extends Component {
 
   // 点击音频header
   handleClickAudiosDir = ev => {
-    document.documentElement.style.overflow = 'hidden';
+    // document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
-    document.body.style.position = 'fixed';
+    // document.body.style.position = 'fixed';
     this.setState({
       audio: ev,
       showAudio: true
@@ -399,9 +399,9 @@ class ClassifyPageImages extends Component {
 
   // 关闭
   handleCloseMedia = ev => {
-    document.documentElement.style.overflow = '';
+    // document.documentElement.style.overflow = '';
     document.body.style.overflow = '';
-    document.body.style.position = '';
+    // document.body.style.position = '';
     this.setState({
       video: null,
       audio: null,
