@@ -137,18 +137,22 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
         SOURCE_DIRS[sourceIndex],
         decodeURIComponent(ctx.params.path)
       );
+      
+      const isMP3 = /\.mp3$/.test(rspath)
+
       let res = null;
       // 获取资源信息
       try {
         res = await fsStat(rspath);
       } catch (err) {
+        console.log(false)
         ctx.status = 404;
         throw err;
       }
 
       // 获取 range 信息
       const range = ctx.headers.range;
-      // console.log(range);
+      // console.log(ctx.headers);
       if (range) {
         const positions = range.replace(/bytes=/, '').split('-');
 
@@ -167,7 +171,7 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
           'Content-Range': `bytes ${start}-${end}/${total}`,
           'Accept-Ranges': 'bytes',
           'Content-Length': end - start + 1,
-          'Content-Type': 'video/mp4'
+          'Content-Type': isMP3 ? 'audio/mp3' : 'video/mp4'
         }
 
         // 视频流

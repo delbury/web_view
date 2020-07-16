@@ -19,7 +19,7 @@ class PageImageIndex extends Component {
         { title: 'Classify' },
         { title: 'Folder' }
       ],
-      currentTabIndex: 0,
+      currentTabIndex: 1,
       hammer: null
     };
     // this.state.hammer = null;

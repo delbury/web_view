@@ -3,15 +3,12 @@ import { Icon } from 'antd';
 import './style/media.scss';
 
 export default class PageAudios extends Component {
-  handleTouchMove = ev => {
-    ev.stopPropagation();
-    ev.preventDefault();
-  }
-
   componentDidMount() {
     this.refs.mediabox.addEventListener('touchmove', ev => {
-      ev.stopPropagation();
-      ev.preventDefault();
+      if(ev.target === this.refs.mediabox) {
+        ev.stopPropagation();
+        ev.preventDefault();
+      }
     })
   }
 
@@ -31,13 +28,18 @@ export default class PageAudios extends Component {
         </div>
         
         <audio
+          ref="audio"
           controls
           playsInline
-          src={window.API_BASE_URL + audio.src}
           preload="metadata"
           volume="1"
+          src={window.API_BASE_URL + audio.sourcrPath + `/${audio.sourceIndex}`}
         ></audio>
       </div>
     );
   }
 }
+
+// src={window.API_BASE_URL + audio.sourcrPath + `/${audio.sourceIndex}`}
+// src={window.API_BASE_URL + audio.src}
+

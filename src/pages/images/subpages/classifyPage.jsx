@@ -353,6 +353,7 @@ class ClassifyPageImages extends Component {
     // document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
     // document.body.style.position = 'fixed';
+    console.log(ev)
     this.setState({
       audio: ev,
       showAudio: true

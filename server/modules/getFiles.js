@@ -97,11 +97,16 @@ async function getFiles(baseUrl, tree, index) {
       } else if (audioReg.test(ext)) {
         // 音频
         type = 'audio';
+        const bp = encodeURIComponent(path.relative(resourceBaseUrl, fullName));
         sources[index].audioList.push(srcobj);
         tree.files.push({
           ...srcobj,
           type,
-          size: stats.size
+          size: stats.size,
+          sourcrPath: path.format({
+            dir: rootPath,
+            base: '/play/' + bp
+          })
         });
       } else if(pdfReg.test(ext)) {
         // pdf
