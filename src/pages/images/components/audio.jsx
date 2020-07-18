@@ -4,12 +4,12 @@ import './style/media.scss';
 
 export default class PageAudios extends Component {
   componentDidMount() {
-    this.refs.mediabox.addEventListener('touchmove', ev => {
-      if(ev.target === this.refs.mediabox) {
-        ev.stopPropagation();
-        ev.preventDefault();
-      }
-    })
+    // this.refs.mediabox.addEventListener('touchmove', ev => {
+    //   if(ev.target === this.refs.mediabox) {
+    //     ev.stopPropagation();
+    //     ev.preventDefault();
+    //   }
+    // })
   }
 
   render() {

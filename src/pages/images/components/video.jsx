@@ -128,19 +128,11 @@ export default class PageVideos extends Component {
       paused: video.paused
     });
 
-    this.refs.mediabox.addEventListener('touchmove', ev => {
-      if(ev.target === this.refs.mediabox) {
-        ev.stopPropagation();
-        ev.preventDefault();
-      }
-    })
-    // this.refs.videoContainer.addEventListener('touchmove', ev => {
-    //   print('videoContainer')
-    // })
-    // document.addEventListener('touchmove', ev => {
-    //   print('document')
-    //   ev.stopPropagation();
-    //   ev.preventDefault();
+    // this.refs.mediabox.addEventListener('touchmove', ev => {
+    //   if(ev.target !== video) {
+    //     ev.stopPropagation();
+    //     ev.preventDefault();
+    //   }
     // })
   }
 
