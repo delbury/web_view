@@ -16,10 +16,10 @@ let rootPath = '';
 
 const sources = [];
 
-const imageReg = /\.(jpg)|(jpeg)|(png)|(gif)/i;
-const videoReg = /\.(mp4)|(ogg)|(webm)/i;
-const audioReg = /\.(mp3)|(ogg)|(wav)/i;
-const pdfReg = /\.(pdf)/i;
+const imageReg = /\.(jpg|jpeg|png|gif)$/i;
+const videoReg = /\.(mp4|ogg|webm)$/i;
+const audioReg = /\.(mp3|ogg|wav)$/i;
+const pdfReg = /\.(pdf)$/i;
 const FILES_INFO_NAME = 'files_info';
 const FILES_STATS_NAME = 'files_stats';
 
@@ -99,6 +99,10 @@ async function getFiles(baseUrl, tree, index) {
         type = 'audio';
         const bp = encodeURIComponent(path.relative(resourceBaseUrl, fullName));
         sources[index].audioList.push(srcobj);
+        let lrcPath = '';
+        if(files.includes(item.replace(audioReg, '.lrc'))) {
+          lrcPath = bp.replace(audioReg, '.lrc')
+        }
         tree.files.push({
           ...srcobj,
           type,
@@ -106,7 +110,8 @@ async function getFiles(baseUrl, tree, index) {
           sourcrPath: path.format({
             dir: rootPath,
             base: '/play/' + bp
-          })
+          }),
+          lrcPath
         });
       } else if(pdfReg.test(ext)) {
         // pdf
