@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div>
+    <input id="file" type="file">
+  </div>
+  <script type="module">
+    import LrcParser from './lrc-parser.js'
+    const file = document.getElementById('file');
+    file.onchange = ev => {
+      const lrc = new LrcParser(ev.target.files[0])
+    };
+  </script>
+</body>
+</html>
