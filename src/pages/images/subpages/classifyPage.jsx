@@ -333,11 +333,27 @@ class ClassifyPageImages extends Component {
     }
   }
 
+  // 记录滚动距离，防止滚动穿透
+  preventScrollPenetrate() {
+    this._currentScrollTop = document.scrollingElement.scrollTop
+    document.body.style.overflow = 'hidden';
+    document.body.style.top = -this._currentScrollTop + 'px'
+    document.body.style.position = 'fixed';
+  }
+
+  // 滚动穿透恢复原滚动距离
+  recoverScroll() {
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.top = '0px'
+    document.scrollingElement.scrollTo(0, this._currentScrollTop || 0)
+    this._currentScrollTop = 0
+  }
+
   // 点击视频header
   handleClickVideosDir = (video, index, arr) => {
-    // document.documentElement.style.overflow = 'hidden';
-    document.body.style.overflow = 'hidden';
-    // document.body.style.position = 'fixed';
+    this.preventScrollPenetrate();
+
     this.setState({
       video,
       showVideo: true,
@@ -350,9 +366,8 @@ class ClassifyPageImages extends Component {
 
   // 点击音频header
   handleClickAudiosDir = ev => {
-    // document.documentElement.style.overflow = 'hidden';
-    document.body.style.overflow = 'hidden';
-    // document.body.style.position = 'fixed';
+    this.preventScrollPenetrate();
+
     this.setState({
       audio: ev,
       showAudio: true
@@ -399,9 +414,8 @@ class ClassifyPageImages extends Component {
 
   // 关闭
   handleCloseMedia = ev => {
-    // document.documentElement.style.overflow = '';
-    document.body.style.overflow = '';
-    // document.body.style.position = '';
+    this.recoverScroll();
+    
     this.setState({
       video: null,
       audio: null,

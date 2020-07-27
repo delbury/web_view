@@ -65,23 +65,24 @@ export default class PageVideos extends Component {
     // 开始拖动
     video.ontouchstart = ev => {
       // 双击切换播放状态
-      if(this._dblclickTimer) {
-        clearTimeout(this._dblclickTimer);
-        this._dblclickTimer = null;
+      // if(this._dblclickTimer) {
+      //   print('inner')
+      //   clearTimeout(this._dblclickTimer);
+      //   this._dblclickTimer = null;
 
-        if(this.state.paused) {
-          video.play();
-        } else {
-          video.pause();
-        }
+      //   if(this.state.paused) {
+      //     video.play();
+      //   } else {
+      //     video.pause();
+      //   }
 
-        ev.preventDefault();
-        return;
-      } else {
-        this._dblclickTimer = setTimeout(() => {
-          this._dblclickTimer = null;
-        }, 300)
-      }
+      //   ev.preventDefault();
+      //   return;
+      // } else {
+      //   this._dblclickTimer = setTimeout(() => {
+      //     this._dblclickTimer = null;
+      //   }, 350)
+      // }
 
       // 开始拖动快进
       if(this.state.videoStyle.rotate === 0 || this.state.videoStyle.rotate === 180) {
@@ -93,7 +94,7 @@ export default class PageVideos extends Component {
 
     // 拖动中
     video.ontouchmove = ev => {
-      const step = 3;
+      const step = 2.8;
       if(this.state.videoStyle.rotate === 0) {
         this._offsetTouce = (ev.touches[0].clientX - this._startTouce) / step;
       } else if(this.state.videoStyle.rotate === 180) {
@@ -127,10 +128,12 @@ export default class PageVideos extends Component {
       paused: video.paused
     });
 
-    this.refs.mediabox.addEventListener('touchmove', ev => {
-      ev.stopPropagation();
-      ev.preventDefault();
-    })
+    // this.refs.mediabox.addEventListener('touchmove', ev => {
+    //   if(ev.target !== video) {
+    //     ev.stopPropagation();
+    //     ev.preventDefault();
+    //   }
+    // })
   }
 
   // 旋转
@@ -353,22 +356,32 @@ export default class PageVideos extends Component {
           </div>
         </div>
         
-        <video
-          ref="video"
-          poster={window.API_BASE_URL + video.posterPath + `/${video.sourceIndex}`}
-          controls
-          playsInline
-          src={window.API_BASE_URL + video.sourcrPath + `/${video.sourceIndex}`}
-          type="video/mp4"
-          preload="metadata"
+        <div
+          ref="videoContainer"
           style={{
             transform: `rotate(${rotate}deg)`,
             width,
             height,
             maxWidth,
-            maxHeight
+            maxHeight,
           }}
-        ></video>
+        >
+          <video
+            ref="video"
+            poster={window.API_BASE_URL + video.posterPath + `/${video.sourceIndex}`}
+            controls
+            playsInline
+            src={window.API_BASE_URL + video.sourcrPath + `/${video.sourceIndex}`}
+            type="video/mp4"
+            preload="metadata"
+            style={{
+              width,
+              height,
+              maxWidth,
+              maxHeight
+            }}
+          ></video>
+        </div>
         {
           !!toastMsg ?
             <div className="toast" style={{
