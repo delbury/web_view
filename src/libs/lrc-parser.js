@@ -2,8 +2,9 @@ const MATHCES = [
   {
     // 歌词时间轴
     key: 'timeAxis',
-    reg: /^(?<time>\[.*:.*\])(?<lyric>.+)\s*$/,
-    oTseparator: '_%ot%_' // 原文译文分割字符串
+    reg: /^(?<times>\[.*:.*\])(?<lyric>.+)\s*$/,
+    timeReg: /\[(.+?:.+?)\]/, // 时间正则
+    lyricReg: '_%ot%_', // 原文译文分割字符串
   },
   {
     // 歌手
@@ -51,25 +52,55 @@ export default class LrcParser {
     reader.readAsText(file);
   }
 
-  // 解析歌词文件
-  parseLrcText(text) {
-    const lines = text.split(/\r+\n+/);
+  /**
+   * @description 解析lrc歌词文本
+   * @param {*} text 待解析歌词文本
+   * @param {*} isLyricMerge 是否合并歌词
+   */
+  parseLrcText(text, isLyricMerge = false) {
+    const lines = text.split(/\r+\n+/).filter(line => !!line);
     const tempObj = {
-      lyric: []
+      lyrics: []
     };
+    let count = lines.length; // 统计行
     for(let line of lines) {
       // 逐行解析
       for(let conf of MATHCES) {
         // 匹配
-        console.log(conf.reg, line, conf.reg.test(line))
         if(conf.reg.test(line)) {
           // 匹配成功
           const res = line.match(conf.reg);
           if(conf.key === 'timeAxis') {
             // 时间轴
             if(res.groups) {
-              //
-              // console.log(res.groups)
+              const lrcObj = {};
+              // 歌词原文、译文分割
+              const lrcArr = res.groups.lyric.split(conf.lyricReg);
+              lrcObj.originalLyric = lrcArr[0].trim(); // 原文
+              lrcObj.translationalLyric = (lrcArr[1] || '').trim(); // 译文
+
+              // 时刻
+              const timeArr = res.groups.times.split(conf.timeReg).filter(time => !!time);
+              if(isLyricMerge) {
+                // 合并相同的歌词
+                tempObj.lyrics.push({
+                  ...lrcObj,
+                  times: timeArr.map(time => {
+                    const arr = time.split(':');
+                    return +arr[0] * 60 + +arr[1];
+                  })
+                })
+              } else {
+                // 拆分不同时刻相同的歌词
+                for(let time of timeArr) {
+                  const arr = time.split(':');
+                  const sec = +arr[0] * 60 + +arr[1];
+                  tempObj.lyrics.push({
+                    ...lrcObj,
+                    time: sec
+                  })
+                }
+              }
             }
 
           } else {
@@ -79,11 +110,17 @@ export default class LrcParser {
             }
           }
 
+          count--;
           break;
         }
       }
     }
 
+    if(!isLyricMerge) {
+      // 排序
+      tempObj.lyrics.sort((a, b) => a.time - b.time)
+    }
+    console.log(count === 0 ? `已完成` : `未完成: ${count}`);
     console.log(tempObj)
   }
 }
