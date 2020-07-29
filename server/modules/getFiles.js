@@ -101,7 +101,7 @@ async function getFiles(baseUrl, tree, index) {
         sources[index].audioList.push(srcobj);
         let lrcPath = '';
         if(files.includes(item.replace(audioReg, '.lrc'))) {
-          lrcPath = bp.replace(audioReg, '.lrc')
+          lrcPath = '/' + bp.replace(audioReg, '.lrc')
         }
         tree.files.push({
           ...srcobj,

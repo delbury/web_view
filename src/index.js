@@ -8,6 +8,9 @@ import './assets/icon/iconfont.css';
 import { HashRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import store from './store';
+import smoothscroll from 'smoothscroll-polyfill';
+
+smoothscroll.polyfill();
 
 window.API_BASE_URL = process.env.REACT_APP_API_BASE_URL
 window.print = (msg) => {

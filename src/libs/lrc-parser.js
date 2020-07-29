@@ -38,6 +38,8 @@ export default class LrcParser {
     this.file = file;
     this.done = done; // 解析完成回调
     this.result = null;
+    this.currentLyricIndex = 0; // 当前的歌词index
+    this.prevLyricIndex = -1; // 上一个歌词的index
     // this.readFile(file);
   }
 
@@ -131,6 +133,8 @@ export default class LrcParser {
 
     this.result = tempObj;
     this.done && this.done(tempObj);
+    this.currentLyricIndex = 0;
+    this.prevLyricIndex = -1;
   }
 
   // 加载并解析远程文件
@@ -141,10 +145,61 @@ export default class LrcParser {
           'accept': 'text/plain, */*'
         }
       });
-      const text = await res.text();
-      this.parseLrcText(text);
+      if(res.status >= 200 && res.status < 300) {
+        const text = await res.text();
+        this.parseLrcText(text);
+        return this.result;
+      } else {
+        throw Error('http error: ' + res.status);
+      }
     } catch(err) {
       console.log(err);
     }
+  }
+
+  // 获取当前时间的歌词
+  lyricGenerator(sec) {
+    if(!this.result) {
+      return;
+    }
+    const time = (sec - +this.result.offset / 1000);
+    for(let i = 0, len = this.result.lyrics.length; i < len; i++) {
+      if(i === 0 && time <= this.result.lyrics[i].time) {
+        this.currentLyricIndex = 0;
+        break;
+      } else if(i === len - 1 && time >= this.result.lyrics[i].time) {
+        this.currentLyricIndex = len - 1;
+        break;
+      } else if(time >= this.result.lyrics[i].time && time <= this.result.lyrics[i + 1].time) {
+        if(Math.abs(time - this.result.lyrics[i].time) <= Math.abs(time - this.result.lyrics[i + 1].time)) {
+          this.currentLyricIndex = i;
+        } else {
+          this.currentLyricIndex = i + 1;
+        }
+        break;
+      }
+    }
+    if(this.currentLyricIndex !== this.prevLyricIndex) {
+      this.prevLyricIndex = this.currentLyricIndex;
+
+      // this.lyricFormatter();
+      return {
+        changed: true,
+        index: this.currentLyricIndex
+      };
+    }
+    return {
+      changed: false,
+      index: this.currentLyricIndex
+    };
+  }
+
+  // 歌词格式化输出
+  lyricFormatter() {
+    console.log(
+      this.currentLyricIndex,
+      this.result.lyrics[this.currentLyricIndex].originalLyric,
+      this.result.lyrics[this.currentLyricIndex].translationalLyric
+    )
   }
 }

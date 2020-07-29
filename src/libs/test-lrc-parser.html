@@ -12,7 +12,7 @@
     <button id="remote">远程</button>
   </div>
   <div class="center">
-    <audio src="./wenjianjia/音的爱仕达/和田薫 - 时代を超える想い2.mp3" controls muted></audio>
+    <audio id="audio" src="../../server/pd/南杉 - 樱花樱花想见你.mp3" controls></audio>
   </div>
   <script type="module">
     import LrcParser from '../../src/libs/lrc-parser.js'
@@ -25,6 +25,9 @@
     const url = 'http://127.0.0.1:4000/test_樱花樱花想见你 - 南杉.lrc'
     document.getElementById('remote').onclick = ev => {
       lp.readRemoteFile(url);
+    };
+    document.getElementById('audio').ontimeupdate = ev => {
+      lp.lyricGenerator(ev.target.currentTime);
     }
   </script>
 </body>
