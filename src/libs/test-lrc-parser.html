@@ -4,17 +4,28 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+
 </head>
 <body>
-  <div>
+  <div class="center">
     <input id="file" type="file">
+    <button id="remote">远程</button>
+  </div>
+  <div class="center">
+    <audio src="./wenjianjia/音的爱仕达/和田薫 - 时代を超える想い2.mp3" controls muted></audio>
   </div>
   <script type="module">
-    import LrcParser from './lrc-parser.js'
+    import LrcParser from '../../src/libs/lrc-parser.js'
     const file = document.getElementById('file');
+    const lp = new LrcParser({ done: res => console.log(res) });
     file.onchange = ev => {
-      const lrc = new LrcParser(ev.target.files[0])
+      const lrc = lp.readFile(ev.target.files[0])
     };
+
+    const url = 'http://127.0.0.1:4000/test_樱花樱花想见你 - 南杉.lrc'
+    document.getElementById('remote').onclick = ev => {
+      lp.readRemoteFile(url);
+    }
   </script>
 </body>
 </html>

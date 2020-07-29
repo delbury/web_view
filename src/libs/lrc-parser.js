@@ -34,20 +34,27 @@ const MATHCES = [
 ];
 
 export default class LrcParser {
-  constructor(file) {
-    if(!file || !(file instanceof Blob)) {
-      throw new TypeError('error file type')
-    }
-
+  constructor({ file = null, done = null } = {}) {
     this.file = file;
-    this.readFile(file);
+    this.done = done; // 解析完成回调
+    this.result = null;
+    // this.readFile(file);
+  }
+
+  // 验证文件
+  static validateFile(file) {
+    if(!file || !(file instanceof Blob)) {
+      throw new TypeError('error file type');
+    }
   }
 
   // 读取文件
   readFile(file) {
+    LrcParser.validateFile(file);
+
     const reader = new FileReader();
     reader.onload = ev => {
-      this.parseLrcText(ev.target.result)
+      this.parseLrcText(ev.target.result);
     };
     reader.readAsText(file);
   }
@@ -89,7 +96,7 @@ export default class LrcParser {
                     const arr = time.split(':');
                     return +arr[0] * 60 + +arr[1];
                   })
-                })
+                });
               } else {
                 // 拆分不同时刻相同的歌词
                 for(let time of timeArr) {
@@ -106,7 +113,7 @@ export default class LrcParser {
           } else {
             // 其他属性
             if(res.groups) {
-              tempObj[conf.key] = res.groups.content || ''
+              tempObj[conf.key] = res.groups.content || '';
             }
           }
 
@@ -118,9 +125,26 @@ export default class LrcParser {
 
     if(!isLyricMerge) {
       // 排序
-      tempObj.lyrics.sort((a, b) => a.time - b.time)
+      tempObj.lyrics.sort((a, b) => a.time - b.time);
     }
     console.log(count === 0 ? `已完成` : `未完成: ${count}`);
-    console.log(tempObj)
+
+    this.result = tempObj;
+    this.done && this.done(tempObj);
+  }
+
+  // 加载并解析远程文件
+  async readRemoteFile(url) {
+    try {
+      const res = await fetch(url, {
+        headers: {
+          'accept': 'text/plain, */*'
+        }
+      });
+      const text = await res.text();
+      this.parseLrcText(text);
+    } catch(err) {
+      console.log(err);
+    }
   }
 }

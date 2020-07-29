@@ -5,7 +5,7 @@ const koaStatic = require('koa-static');
 const bodyParser = require('koa-bodyparser');
 // const koaOnerror = require('koa-onerror');
 // const range = require('koa-range');
-const expert = require('chai').expect;
+// const expert = require('chai').expect;
 const fs = require('fs');
 const promisify = require('util').promisify;
 const fsReadFile = promisify(fs.readFile);
@@ -27,9 +27,6 @@ let {
 const {
   HOST,
   INFO_FILES_DIR,
-  RESOURCE_BASE_DIR,
-  RESOURCE_DIR_NAME,
-  SOURCE_DIR,
   SOURCE_DIRS,
   excludeErrorCodes,
   ERROR_LOG_FILE,
@@ -268,6 +265,7 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
         }
       }
     })
+    // 记录日志    
     .post('/log', async ctx => {
       try {
         await recordLog(ctx.query.msg, true);
@@ -313,11 +311,15 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
     });
 
   for (let key in SOURCE_DIRS) {
-    app.use(koaStatic(SOURCE_DIRS[key]));
+    app.use(koaStatic(SOURCE_DIRS[key], {
+      setHeaders(res) {
+        res.setHeader('Access-Control-Allow-Origin', '*')
+      }
+    }));
   }
   app
     .use(async (ctx, next) => {
-      ctx.set('Access-Control-Allow-Origin', "*");
+      ctx.set('Access-Control-Allow-Origin', '*');
       await next();
     })
     .use(router.routes())
