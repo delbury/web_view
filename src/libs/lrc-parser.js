@@ -162,7 +162,7 @@ export default class LrcParser {
     if(!this.result) {
       return;
     }
-    const time = (sec - +this.result.offset / 1000);
+    const time = (sec - +(this.result.offset || 0) / 1000);
     for(let i = 0, len = this.result.lyrics.length; i < len; i++) {
       if(i === 0 && time <= this.result.lyrics[i].time) {
         this.currentLyricIndex = 0;

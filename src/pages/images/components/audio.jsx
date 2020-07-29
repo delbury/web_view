@@ -20,7 +20,9 @@ export default class PageAudios extends Component {
       const res = this.lp.lyricGenerator(ev.target.currentTime);
       if(res.changed) {
         const ele = document.querySelector(`.lrc-line[data-key="${res.index}"]`);
-
+        if(!ele) {
+          return;
+        }
         const offsetTop = ele.offsetTop;
         if(offsetTop > this.lrcBoxHalfHeight) {
           this.refs.lrcBox.scrollTo({
