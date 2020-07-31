@@ -1,3 +1,9 @@
+/**
+ * @description 本地静态文件服务器
+ * process.argv：
+ *  -f: 强制重新获取文件结构
+ */
+
 const Koa = require('koa');
 const path = require('path').posix;
 const Router = require('koa-router');
@@ -32,6 +38,7 @@ const {
   ERROR_LOG_FILE,
 } = require('./config');
 
+
 // 记录log
 async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
   const date = tools.getCurrentDateTime();
@@ -54,7 +61,7 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
   // 获取本地资源列表
   const localTrees = await init(
     [...SOURCE_DIRS],
-    { hasInput: false, host: HOST, forceReload: false }
+    { hasInput: false, host: HOST, forceReload: process.argv.includes('-f') }
   );
   const trees = localTrees.length ? localTrees : sources;
 

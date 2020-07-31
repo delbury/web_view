@@ -178,23 +178,25 @@ async function init(urls, { hasInput = true, host = '/', forceReload = false } =
 
     let needReloadFiles = false; // 是否需要重新加载文件夹信息
 
-    // 判断文件是否被修改
-    try {
-      await fsAccess(path.join(__dirname, files_stats_name_list[index]));
-      const currentStat = await fsStat(url);
-      const oldStat = await readInfo(path.join(__dirname, files_stats_name_list[index]));
+    if(!forceReload) {
+      // 判断文件是否被修改
+      try {
+        await fsAccess(path.join(__dirname, files_stats_name_list[index]));
+        const currentStat = await fsStat(url);
+        const oldStat = await readInfo(path.join(__dirname, files_stats_name_list[index]));
 
-      // 文件修改过
-      if (currentStat.ctimeMs === oldStat.ctimeMs) {
-        needReloadFiles = false;
-      } else {
-        await saveFileStat(__dirname, currentStat, index);
+        // 文件修改过
+        if (currentStat.ctimeMs === oldStat.ctimeMs) {
+          needReloadFiles = false;
+        } else {
+          await saveFileStat(__dirname, currentStat, index);
+          needReloadFiles = true;
+        }
+      } catch (err) {
+        const stat = await fsStat(url);
+        await saveFileStat(__dirname, stat, index);
         needReloadFiles = true;
       }
-    } catch (err) {
-      const stat = await fsStat(url);
-      await saveFileStat(__dirname, stat, index);
-      needReloadFiles = true;
     }
 
     try {
