@@ -1,3 +1,8 @@
+/**
+ * @description LRC歌词解析器
+ * @author delbury
+ * @version 1.0
+ */
 const MATHCES = [
   {
     // 歌词时间轴

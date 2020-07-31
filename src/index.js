@@ -1,3 +1,4 @@
+import './libs/init'
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
@@ -11,31 +12,6 @@ import store from './store';
 import smoothscroll from 'smoothscroll-polyfill';
 
 smoothscroll.polyfill();
-
-window.API_BASE_URL = process.env.REACT_APP_API_BASE_URL
-window.print = (msg) => {
-  if(typeof msg === 'object') {
-    msg = JSON.stringify(msg, null, 2);
-  }
-  return window.fetch(window.API_BASE_URL + '/console', {
-    method: 'post',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
-    },
-    body: `msg=${encodeURIComponent(msg)}`
-  });
-};
-
-window.addEventListener('error', ev => {
-  window.print(ev.message);
-});
-
-// window.print(("wkWebView " in window).toString());
-
-if ("wView" in window) {
-  window.wView.allowsInlineMediaPlayback = "YES";
-  window.wView.mediaPlaybackRequiresUserAction = "NO";
-}
 
 ReactDOM.render(
   <Provider store={store}>

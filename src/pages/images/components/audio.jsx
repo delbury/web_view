@@ -24,7 +24,11 @@ export default class PageAudios extends Component {
 
     const audio = this.refs.audio;
     audio.ontimeupdate = ev => {
+      if(!this.lp.result) {
+        return
+      }
       const res = this.lp.lyricGenerator(ev.target.currentTime);
+
       if(res.changed) {
         const ele = document.querySelector(`.lrc-line[data-key="${res.index}"]`);
         if(!ele) {
@@ -105,7 +109,7 @@ export default class PageAudios extends Component {
 
   render() {
     const audio = this.props.audio;
-    const { currentIndex, rateIndex, paused, lrcBoxHalfHeight } = this.state;
+    const { currentIndex, rateIndex, paused, lrcBoxHalfHeight, lrcs } = this.state;
     const lrcMaxIndex = this.state.lrcs.length - 1;
     return (
       <div 
@@ -176,9 +180,9 @@ export default class PageAudios extends Component {
           onTouchEnd={this.eventTouchendLrcBox}
           onTouchStart={this.eventTouchstartLrcBox}
         >
-          <span className="divider"></span>
+          { lrcs.length ? <span className="divider"></span> : '' }
           {
-            this.state.lrcs.map((lrc, index) => (
+            lrcs.length ? this.state.lrcs.map((lrc, index) => (
               <div
                 className={`lrc-line ${currentIndex === index ? 'actived' : ''}`}
                 key={index}
@@ -197,7 +201,7 @@ export default class PageAudios extends Component {
                 }
               </div>
               
-            ))
+            )) : <div className="lrc-empty"><span>暂无歌词</span></div>
           }
         </div>
         

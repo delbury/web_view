@@ -1,7 +1,6 @@
 import axios from 'axios';
-// const HOST = 'http://192.168.0.104:4000';
-const HOST = process.env.REACT_APP_API_BASE_URL;
-
+const HOST = window.API_BASE_URL;
+console.log(HOST)
 // 获取随机图片
 export const getRandomImages = async (ars) => {
   return await axios.get(HOST + '/images/random', {
