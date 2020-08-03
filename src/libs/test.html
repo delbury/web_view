@@ -1,14 +1,58 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <style>
+    canvas {
+      border: 1px solid skyblue;
+    }
+  </style>
 </head>
+
 <body>
-  <audio id="audios" src="../../server/pd/白夜繁星 - つないだ手にキスを- 奏之曲（Piano Cover）.mp3"></audio>
+  <canvas id="canvas" width="800" height="180"></canvas>
+  <div>
+    <!-- <audio src="../../server/pd/僕は君に恋をした - 凑诗.mp3" id="audio" controls></audio> -->
+    <audio src="../../server/pd/和田薫 - 时代を超える想い2.mp3" id="audio" controls></audio>
+    <button id="play">播放</button>
+    <button id="pause">暂停</button>
+  </div>
   <script type="module">
     import AudioProcessor from './audio-processor.js';
+    import AudioVisualization from './audio-visualization.js';
+    const audio = document.getElementById('audio');
+    const canvas = document.getElementById('canvas');
+    let ap = null;
+    let av = null;
+
+
+    document.getElementById('play').onclick = ev => {
+      if(!ap) {
+        ap = new AudioProcessor(audio, { analyser: { fftSize: 4096 } });
+        av = new AudioVisualization(canvas);
+        const type = 'freq';
+        const bit = 8;
+        const res = ap.getAnalyserDataHandler(type, bit);
+        av.setDrawType({
+          type,
+          getter: res.handler,
+          params: res.params,
+          bit,
+        });
+      }
+      ap.play();
+      av.startDrawing();
+    };
+    document.getElementById('pause').onclick = ev => {
+      if(ap) {
+        ap.pause();
+        av.stopDrawing();
+      }
+    };
   </script>
 </body>
+
 </html>
