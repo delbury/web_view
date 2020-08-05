@@ -12,6 +12,11 @@ export default class AudioVisualization {
 
     this.drawing = false; // 是否绘制中
     this.drawType = 'time'; // 绘图类型： time | freq
+    this.drawTypeMethodsMap = {
+      'time': this.drawTimeWaveFigure.bind(this),
+      'freq': this.drawFreqWaveFigure.bind(this),
+      'freq-histogram': this.drawFreqHistogramFigure.bind(this),
+    };
     this.drawDataBit = 8; // 绘图数据位数： 8 | 32
     this.aniReq = null; // 动画帧标识
 
@@ -33,17 +38,32 @@ export default class AudioVisualization {
    * @param {String} type time | freq
    * @param {Function} getter 获取数据回调
    * @param {Number} bit 数据位数
-   * @param {Object} params 参数
+   * @param {Object} params 参数：columns：20, 直方图的柱状数量
    */
   setDrawType({ type, getter, bit = 8, params = {} }) {
     this.drawType = type;
     this.drawDataBit = bit;
     this.arraybufferCallback = getter;
+
     this.drawParams = {
       ...params,
       xDiv: this.canvas.width / params.frequencyBinCount,
       yDiv: this.canvas.height / 255
     };
+    
+    // 其他参数
+    if(type === 'freq-histogram') {
+      const columns = +this.drawParams.columns || 20; // 柱子数量
+      const gapScale = 0.2; // 柱状图间隔，相对于柱子的宽度
+      const width = this.canvas.width / columns - (columns - 1) * gapScale;
+
+      this.drawParams.freqHistogram = {
+        columns,
+        columnsScaleFactor: Math.pow(22050, 1 / columns),
+        columnsGap: width * gapScale,
+        columnsWidth: width,
+      };
+    }
   }
 
   // 设置宽高
@@ -69,7 +89,7 @@ export default class AudioVisualization {
   }
 
   // 绘制时域波形
-  drawTime(buffer) {
+  drawTimeWaveFigure(buffer) {
     this.ctx.save();
     this.ctx.beginPath();
 
@@ -93,7 +113,7 @@ export default class AudioVisualization {
   }
 
   // 绘制频域波形
-  drawFreq(buffer) {
+  drawFreqWaveFigure(buffer) {
     this.ctx.save();
     this.ctx.beginPath();
 
@@ -116,6 +136,44 @@ export default class AudioVisualization {
     this.ctx.restore();
   }
 
+  // 频域柱状图
+  drawFreqHistogramFigure(buffer) {
+    const {
+      columns,
+      columnsScaleFactor: factor,
+      columnsGap: gap,
+      columnsWidth: width,
+    } = this.drawParams.freqHistogram;
+    let index = 0;
+    let count = 0;
+    const len = buffer.length;
+    while(index <= len) {
+      this.ctx.save();
+      this.ctx.beginPath();
+
+      const offsetX = count * (width + gap);
+      this.ctx.moveTo(offsetX, this.canvas.height);
+      this.ctx.lineTo(offsetX + width, this.canvas.height);
+
+      if(this.drawDataBit === 8) {
+        const offsetY = (255 - buffer[index]) * this.drawParams.yDiv;
+        this.ctx.lineTo(offsetX + width, offsetY);
+        this.ctx.lineTo(offsetX, offsetY);
+      } else if (this.drawDataBit === 32) {
+        const offsetY = (1 - (buffer[index] - this.drawParams.dbMin) / this.drawParams.dbRange) * this.canvas.height;
+        this.ctx.lineTo(offsetX + width, offsetY);
+        this.ctx.lineTo(offsetX, offsetY);
+      }
+
+      this.ctx.closePath();
+      this.ctx.fill();
+      this.ctx.restore();
+
+      count++;
+      index = Math.round(Math.pow(factor, count));
+    }
+  }
+
   // 每一帧
   tick() {
     if (this.drawing) {
@@ -123,10 +181,9 @@ export default class AudioVisualization {
       const buffer = this.arraybufferCallback();
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-      if (this.drawType === 'time') {
-        this.drawTime(buffer);
-      } else if (this.drawType === 'freq') {
-        this.drawFreq(buffer);
+      const drawFn = this.drawTypeMethodsMap[this.drawType];
+      if (drawFn) {
+        drawFn(buffer);
       }
 
       this.aniReq = requestAnimationFrame(this.tick.bind(this));

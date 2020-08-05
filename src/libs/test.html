@@ -4,52 +4,78 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="data:;base64,=">
   <title>Document</title>
   <style>
     canvas {
       border: 1px solid skyblue;
     }
+
+    .container {
+      display: flex;
+    }
+    .canvas-box {
+      flex: 0;
+    }
   </style>
 </head>
 
 <body>
-  <canvas id="canvas" width="800" height="180"></canvas>
-  <div>
-    <!-- <audio src="../../server/pd/僕は君に恋をした - 凑诗.mp3" id="audio" controls></audio> -->
-    <audio src="../../server/pd/和田薫 - 时代を超える想い2.mp3" id="audio" controls></audio>
-    <button id="play">播放</button>
-    <button id="pause">暂停</button>
+  <div class="container">
+    <div class="canvas-box">
+      <canvas id="canvasFreq" width="800" height="180"></canvas>
+      <canvas id="canvasTime" width="800" height="180"></canvas>
+    </div>
+    <div>
+      <!-- <audio src="../../server/pd/僕は君に恋をした - 凑诗.mp3" id="audio" controls></audio> -->
+      <audio src="../../server/pd/和田薫 - 时代を超える想い2.mp3" id="audio" controls></audio>
+      <button id="play">播放</button>
+      <button id="pause">暂停</button>
+    </div>
   </div>
   <script type="module">
     import AudioProcessor from './audio-processor.js';
     import AudioVisualization from './audio-visualization.js';
     const audio = document.getElementById('audio');
-    const canvas = document.getElementById('canvas');
+    const canvasFreq = document.getElementById('canvasFreq');
+    const canvasTime = document.getElementById('canvasTime');
     let ap = null;
-    let av = null;
-
+    let avf = null;
+    let avt = null;
 
     document.getElementById('play').onclick = ev => {
       if(!ap) {
         ap = new AudioProcessor(audio, { analyser: { fftSize: 4096 } });
-        av = new AudioVisualization(canvas);
-        const type = 'freq';
+        avf = new AudioVisualization(canvasFreq);
+        avt = new AudioVisualization(canvasTime);
+
         const bit = 8;
-        const res = ap.getAnalyserDataHandler(type, bit);
-        av.setDrawType({
-          type,
-          getter: res.handler,
-          params: res.params,
+
+        const resf = ap.getAnalyserDataHandler('freq', bit);
+        avf.setDrawType({
+          type: 'freq',
+          getter: resf.handler,
+          params: resf.params,
+          bit,
+        });
+
+        const rest = ap.getAnalyserDataHandler('freq', bit);
+        avt.setDrawType({
+          type: 'freq-histogram',
+          getter: rest.handler,
+          params: rest.params,
           bit,
         });
       }
       ap.play();
-      av.startDrawing();
+      avf.startDrawing();
+      avt.startDrawing();
     };
     document.getElementById('pause').onclick = ev => {
       if(ap) {
         ap.pause();
-        av.stopDrawing();
+        avf.stopDrawing();
+        avt.stopDrawing();
       }
     };
   </script>
