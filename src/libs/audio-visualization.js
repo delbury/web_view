@@ -55,13 +55,34 @@ export default class AudioVisualization {
     if(type === 'freq-histogram') {
       const columns = +this.drawParams.columns || 20; // 柱子数量
       const gapScale = 0.2; // 柱状图间隔，相对于柱子的宽度
-      const width = this.canvas.width / columns - (columns - 1) * gapScale;
+      const width = this.canvas.width / (columns + (columns - 1) * gapScale);
+
+      const columnRows = +this.drawParams.columnRows || 20;
+      const columnRowsGapScale = 0.3; // 柱虚线的间隔。相对于每行虚线的高度
+      const height = this.canvas.height / (columnRows + (columnRows - 1) * columnRowsGapScale);
+
+      // const fillStyle = this.ctx.createRadialGradient(
+      //   0, this.canvas.height, 0,
+      //   0, this.canvas.height, Math.sqrt(this.canvas.height ** 2 + this.canvas.width ** 2)
+      // );
+      const fillStyle = this.ctx.createLinearGradient(0, this.canvas.height, 0, 0);
+      fillStyle.addColorStop(0, '#10239e');
+      fillStyle.addColorStop(1, '#597ef7');
 
       this.drawParams.freqHistogram = {
+        // 柱图形参数
         columns,
         columnsScaleFactor: Math.pow(22050, 1 / columns),
         columnsGap: width * gapScale,
         columnsWidth: width,
+
+        // 柱图形虚线参数
+        columnRows,
+        columnRowsGap: columnRowsGapScale * height,
+        columnRowsHeight: height,
+        columnRowsDiv: 1 / columnRows, // 每行所占百分比
+
+        fillStyle,
       };
     }
   }
@@ -143,35 +164,60 @@ export default class AudioVisualization {
       columnsScaleFactor: factor,
       columnsGap: gap,
       columnsWidth: width,
+      columnRowsHeight: height,
+      columnRowsDiv,
+      dbMin,
+      dbRange,
+      columnRowsGap,
+      fillStyle,
     } = this.drawParams.freqHistogram;
     let index = 0;
     let count = 0;
     const len = buffer.length;
+
+    this.ctx.save();
+    this.ctx.fillStyle = fillStyle;
     while(index <= len) {
-      this.ctx.save();
       this.ctx.beginPath();
 
       const offsetX = count * (width + gap);
-      this.ctx.moveTo(offsetX, this.canvas.height);
-      this.ctx.lineTo(offsetX + width, this.canvas.height);
-
+      let offsetYCount = 0;
       if(this.drawDataBit === 8) {
-        const offsetY = (255 - buffer[index]) * this.drawParams.yDiv;
-        this.ctx.lineTo(offsetX + width, offsetY);
-        this.ctx.lineTo(offsetX, offsetY);
-      } else if (this.drawDataBit === 32) {
-        const offsetY = (1 - (buffer[index] - this.drawParams.dbMin) / this.drawParams.dbRange) * this.canvas.height;
-        this.ctx.lineTo(offsetX + width, offsetY);
-        this.ctx.lineTo(offsetX, offsetY);
-      }
+        offsetYCount =  Math.ceil(buffer[index] / 255 / columnRowsDiv) ;
 
-      this.ctx.closePath();
-      this.ctx.fill();
-      this.ctx.restore();
+      } else if(this.drawDataBit === 32) {
+        offsetYCount = Math.ceil((buffer[index] - dbMin) / dbRange / columnRowsDiv);
+      }
+      
+      for(let i = 0; i < offsetYCount; i++) {
+        this.ctx.fillRect(
+          offsetX,
+          this.canvas.height - ((i + 1) * height + i * columnRowsGap),
+          width,
+          height,
+        );
+      }
+      /** 实时频率直方图
+        this.ctx.moveTo(offsetX, this.canvas.height);
+        this.ctx.lineTo(offsetX + width, this.canvas.height);
+        if(this.drawDataBit === 8) {
+          const offsetY = (255 - buffer[index]) * this.drawParams.yDiv;
+          this.ctx.lineTo(offsetX + width, offsetY);
+          this.ctx.lineTo(offsetX, offsetY);
+
+        } else if (this.drawDataBit === 32) {
+          const offsetY = (1 - (buffer[index] - this.drawParams.dbMin) / this.drawParams.dbRange) * this.canvas.height;
+          this.ctx.lineTo(offsetX + width, offsetY);
+          this.ctx.lineTo(offsetX, offsetY);
+        }
+        this.ctx.closePath();
+        this.ctx.fill();
+       */
 
       count++;
       index = Math.round(Math.pow(factor, count));
     }
+    this.ctx.restore();
   }
 
   // 每一帧
