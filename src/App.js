@@ -12,10 +12,12 @@ import CacheRoute, { CacheSwitch } from 'react-router-cache-route';
 import { connect } from 'react-redux';
 import { getTreeActionAsync } from './store/action';
 import { consoleTest } from './api';
+import PageRandomVideo from './pages/random-video';
 
 const PAGE_ROUTERS = enmuCreater([
   '/home',
   '/images',
+  '/randomVideo',
   // '/videos'
 ]);
 class App extends Component {
@@ -47,10 +49,11 @@ class App extends Component {
           currentPage={currentPage}
           changePage={this.changePage}
         ></NavBar>
-        <WingBlank>
+        <WingBlank style={{ flex: 1 }}>
           <CacheSwitch>
             <Route exact path={PAGE_ROUTERS[0]} component={PageHome}></Route>
             <CacheRoute exact path={PAGE_ROUTERS[1]} component={PageImages}></CacheRoute>
+            <CacheRoute className="video-page" exact path={PAGE_ROUTERS[2]} component={PageRandomVideo}></CacheRoute>
             {/* <CacheRoute exact path={PAGE_ROUTERS[2]} component={PageVideos}></CacheRoute> */}
             <Redirect to="/home"></Redirect>
           </CacheSwitch>
