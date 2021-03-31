@@ -43,6 +43,12 @@ export default class RandomVideo extends React.Component {
     }
   }
 
+  componentDidMount() {
+    this.refs.video.oncanplay = ev => {
+      this.refs.video.play();
+    };
+  }
+
   render() {
     return (
       <div className="page-random">
