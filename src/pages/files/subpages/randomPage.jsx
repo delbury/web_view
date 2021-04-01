@@ -14,7 +14,8 @@ class RandomPageImages extends Component {
       showView: false,
       index: 0,
       images: [],
-      loading: false
+      loading: false,
+      io: this.createIO(),
     };
     this.pageInfo = {
       pageSize: 10,
@@ -22,6 +23,20 @@ class RandomPageImages extends Component {
       hasNext: true,
       total: 0,
     }
+  }
+  // 创建交叉监听
+  createIO() {
+    const io = new IntersectionObserver((records) => {
+      // 图片懒加载
+      for(const record of records) {
+        const img = record.target.querySelector('img');
+        if(record.isIntersecting && !img.src) {
+          img.src = img.dataset.src;
+          img.style.visibility = 'visible';
+        }
+      }
+    });
+    return io;
   }
   handleImagesViewClick = (ev) => {
     this.setState({ showView: false });
@@ -110,6 +125,7 @@ class RandomPageImages extends Component {
                 <Image
                   img={item}
                   onClick={() => this.handleImageClick(index)}
+                  io={this.state.io}
                 />
               }
               columnNum={2}

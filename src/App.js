@@ -3,7 +3,7 @@ import './styles/index.scss';
 import { Route, Redirect, withRouter } from 'react-router-dom';
 import NavBar from './components/navbar';
 import PageHome from './pages/home';
-import PageImages from './pages/images';
+import PageFiles from './pages/files';
 // import PageVideos from './pages/videos';
 import { enmuCreater } from './libs/util';
 import { WingBlank } from 'antd-mobile';
@@ -16,7 +16,7 @@ import PageRandomVideo from './pages/random-video';
 
 const PAGE_ROUTERS = enmuCreater([
   '/home',
-  '/images',
+  '/files',
   '/randomVideo',
   // '/videos'
 ]);
@@ -52,7 +52,7 @@ class App extends Component {
         <WingBlank style={{ flex: 1 }}>
           <CacheSwitch>
             <Route exact path={PAGE_ROUTERS[0]} component={PageHome}></Route>
-            <CacheRoute exact path={PAGE_ROUTERS[1]} component={PageImages}></CacheRoute>
+            <CacheRoute exact path={PAGE_ROUTERS[1]} component={PageFiles}></CacheRoute>
             <CacheRoute className="video-page" exact path={PAGE_ROUTERS[2]} component={PageRandomVideo}></CacheRoute>
             {/* <CacheRoute exact path={PAGE_ROUTERS[2]} component={PageVideos}></CacheRoute> */}
             <Redirect to="/home"></Redirect>
