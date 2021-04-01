@@ -26,13 +26,13 @@ const FILES_STATS_NAME = 'files_stats';
 const files_info_name_list = [];
 const files_stats_name_list = [];
 
-const ids = [];
+let globalId = Date.now(); // 全局 id
 
-async function getFiles(baseUrl, tree, index) {
+async function getFiles(baseUrl, tree, index, parentId = null) {
   const rootDirName = path.basename(baseUrl);
   tree.dirname = path.basename(rootDirName); // 记录文件夹名称
-  tree.id = `_${index}_${ids[index]}`;
-  ids[index] = (global.BigInt(ids[index]) + 1n).toString();
+  tree.id = (globalId++).toString();
+  tree.parentId = parentId;
 
   // 获取文件夹下所有文件
   const files = await fsReaddir(baseUrl);
@@ -50,7 +50,7 @@ async function getFiles(baseUrl, tree, index) {
         files: []
       };
       tree.children.push(child);
-      await getFiles(fullName, child, index);
+      await getFiles(fullName, child, index, tree.id);
     } else {
       // 否则为文件
       const ext = path.extname(item);
@@ -169,7 +169,6 @@ async function init(urls, { hasInput = true, host = '/', forceReload = false } =
       audioList: [],
       pdfList: []
     };
-    ids[index] = '0';
   }
   rootPath = host;
   const infos = [];
