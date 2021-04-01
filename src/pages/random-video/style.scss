@@ -28,6 +28,10 @@
     margin-bottom: 20px;
     display: flex;
     justify-content: center;
+
+    >*:not(:last-child) {
+      margin-right: 40px;
+    }
   }
 }
 

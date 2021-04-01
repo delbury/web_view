@@ -32,6 +32,11 @@ class App extends Component {
     this.setState({
       currentPage: PAGE_ROUTERS[this.props.location.pathname]
     });
+
+    window.addEventListener('hashchange', ev => {
+      const hash = window.location.hash.replace('#', '')
+      this.setState({ currentPage: PAGE_ROUTERS[hash] });
+    });
   }
   changePage = (pageIndex) => {
     this.setState({ currentPage: pageIndex });

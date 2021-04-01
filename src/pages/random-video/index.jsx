@@ -56,9 +56,13 @@ export default class RandomVideo extends React.Component {
           <video src={this.state.videoSrc} ref="video"></video>
         </div>
         <div className="video-btns">
-          <Button onClick={() => this.state.videoSrc && this.refs.video.play()}>播放</Button>
-          <Button onClick={() => this.state.videoSrc && this.refs.video.pause()}>暂停</Button>
-          <Button type="primary" loading={this.state.loading} onClick={() => this.handleSwitch()}>切换</Button>
+          <Button ghost shape="circle" icon="arrow-left" onClick={() => this.props.history.goBack()}></Button>
+
+          <Button.Group>
+            <Button onClick={() => this.state.videoSrc && this.refs.video.play()}>播放</Button>
+            <Button onClick={() => this.state.videoSrc && this.refs.video.pause()}>暂停</Button>
+            <Button type="primary" loading={this.state.loading} onClick={() => this.handleSwitch()}>切换</Button>
+          </Button.Group>
         </div>
       </div>
     );
