@@ -29,8 +29,11 @@ function computedResource(ctx, arr) {
   const end = start + pageSize;
   return {
     hasNext: end >= len ? false : true,
-    total: Math.ceil(len / pageSize),
-    data: arr.slice(start, end)
+    totalPages: Math.ceil(len / pageSize),
+    totalItems: arr.length,
+    data: arr.slice(start, end),
+    pageNum,
+    pageSize,
   };
 }
 
@@ -52,6 +55,44 @@ function eachRandomResource(ctx, arr) {
     hasNext: len > pageSize,
     data
   }
+}
+
+// 随机分页
+function computedRandomResource(sources, size = 10) {
+  let hasNext = false;
+  const data = [];
+
+  if(sources.length) {
+    hasNext = true;
+    if(size < 5 * sources.length) {
+      // 总资源少时，全部洗牌
+      data.push(...sources);
+    
+      for (let i = sources.length - 1; i >= 0; i--) {
+        const index = Math.floor(Math.random() * (i + 1));
+        [data[i], data[index]] = [data[index], data[i]];
+      }
+    } else {
+      // 总资源较多，抽牌
+      const temp = new Set(); // 缓存已抽取的资源
+      let count = 10;
+      while(count) {
+        const index = Math.floor(Math.random() * sources.length);
+        if(!temp.has(index)) {
+          temp.add(index);
+          count--;
+          data.push(sources[index]);
+        }
+      }
+    }
+  }
+
+  return {
+    hasNext,
+    data: data.slice(0, size),
+    size,
+    totalItems: sources.length,
+  };
 }
 
 // 文件数树
@@ -108,4 +149,5 @@ module.exports = {
   eachRandomResource,
   getCurrentDateTime,
   filterExistDirs,
+  computedRandomResource,
 }

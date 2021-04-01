@@ -8,7 +8,7 @@ export default class PageVideos extends Component {
     super();
     this.state = {
       paused: true,
-      rateIndex: 0,
+      rateIndex: 1,
       showCtrls: true,
       timer: null,
       videoStyle: {
@@ -21,7 +21,7 @@ export default class PageVideos extends Component {
       toastMsg: ''
     };
 
-    this.rateList = [1.0, 1.5, 2.0];
+    this.rateList = [0.5, 1.0, 1.25, 1.5, 2.0];
     this._dblclickTimer = null;
   }
 
@@ -38,7 +38,7 @@ export default class PageVideos extends Component {
     video.oncanplay = ev => {
       video.playbackRate = this.rateList[this.state.rateIndex];
       video.play();
-      print('can play...');
+      // print('can play...');
     };
 
     // 错误

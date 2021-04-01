@@ -120,11 +120,13 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
     })
     // 随机视频
     .get('/videos/random', async ctx => {
+      const size = +ctx.params.size || undefined;
+
       ctx.body = {
         code: 0,
         // data: randomVideos,
         msg: 'successed',
-        ...tools.computedResource(ctx, randomVideos)
+        ...tools.computedRandomResource(randomVideos, size)
       };
     })
     // 文件结构

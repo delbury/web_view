@@ -21,7 +21,8 @@ class RandomPageImages extends Component {
       pageSize: 10,
       pageNum: 1,
       hasNext: true,
-      total: 0,
+      totalPages: 0,
+      totalItems: 0,
     }
   }
   // 创建交叉监听
@@ -87,7 +88,8 @@ class RandomPageImages extends Component {
       images: state.images.concat(res.data)
     }));
     this.pageInfo.hasNext = res.hasNext;
-    this.pageInfo.total = res.total;
+    this.pageInfo.totalPages = res.totalPages;
+    this.pageInfo.totalItems = res.totalItems;
     this.setState({ loading: false });
   }
 

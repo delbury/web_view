@@ -2,14 +2,15 @@ import React from 'react';
 import { Button } from 'antd';
 import './style.scss';
 import { getRandomVideos } from '../../api';
+import Video from '../files/components/video';
 
 export default class RandomVideo extends React.Component {
   constructor(props) {
     super();
     this.state = {
-      videoSrc: '',
       loading: false,
       videoList: [],
+      video: null,
     };
   }
 
@@ -21,8 +22,8 @@ export default class RandomVideo extends React.Component {
       const videoList = [...this.state.videoList];
       const video = videoList.shift();
       this.setState({
-        videoSrc: window.API_BASE_URL + video.sourcrPath + `/${video.sourceIndex}`,
         videoList: videoList,
+        video,
       });
 
     } else {
@@ -35,33 +36,55 @@ export default class RandomVideo extends React.Component {
         const video = list.shift();
 
         this.setState({
-          videoSrc: window.API_BASE_URL + video.sourcrPath + `/${video.sourceIndex}`,
           loading: false,
           videoList: list,
+          video,
         });
       }
     }
   }
 
-  componentDidMount() {
-    this.refs.video.oncanplay = ev => {
-      this.refs.video.play();
-    };
+  // 返回
+  goBack() {
+    this.props.history.goBack();
+  }
+
+  // 关闭
+  handleCloseMedia = () => {
+    this.setState({
+      video: null,
+    });
+  }
+
+  // 前进
+  handleForwardMedia = () => {
+    this.handleSwitch();
   }
 
   render() {
     return (
       <div className="page-random">
         <div className="video-container">
-          <video src={this.state.videoSrc} ref="video"></video>
+          {
+            this.state.video ? 
+              <Video
+                onForward={this.handleForwardMedia}
+                onClose={this.handleCloseMedia}
+                onEnded={this.handleVideoEnded}
+                video={this.state.video}
+                isFirst={true}
+                isLast={false}
+              >
+              </Video> : null
+          }
         </div>
         <div className="video-btns">
-          <Button ghost shape="circle" icon="arrow-left" onClick={() => this.props.history.goBack()}></Button>
+          <Button ghost shape="circle" icon="arrow-left" onClick={() => this.goBack()}></Button>
 
           <Button.Group>
-            <Button onClick={() => this.state.videoSrc && this.refs.video.play()}>播放</Button>
-            <Button onClick={() => this.state.videoSrc && this.refs.video.pause()}>暂停</Button>
-            <Button type="primary" loading={this.state.loading} onClick={() => this.handleSwitch()}>切换</Button>
+            {/* <Button icon="caret-right" onClick={() => this.state.videoSrc && this.refs.video.play()}>播放</Button> */}
+            {/* <Button icon="pause" onClick={() => this.state.videoSrc && this.refs.video.pause()}>暂停</Button> */}
+            <Button icon="step-forward" type="primary" loading={this.state.loading} onClick={() => this.handleSwitch()}>开始</Button>
           </Button.Group>
         </div>
       </div>
