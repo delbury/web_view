@@ -1,5 +1,8 @@
 const expert = require('chai').expect;
 const cloneDeep = require('lodash').cloneDeep;
+const fs = require('fs');
+const promisify = require('util').promisify;
+const fsAccess = promisify(fs.access);
 
 // 随机排列
 function shuffle(array) {
@@ -83,10 +86,26 @@ function getCurrentDateTime() {
   return `${year}-${month}-${day} ${hour}:${minute}:${second}.${ms}`;
 }
 
+// 过滤文件夹列表
+async function filterExistDirs(dirs, log = false) {
+  const arr = [];
+  for await(let dir of dirs) {
+    try {
+      await fsAccess(dir);
+      arr.push(dir);
+    } catch {
+      log && console.log(`${dir} doesn't exist`);
+    }
+  }
+
+  return arr;
+}
+
 module.exports = {
   shuffle,
   computedResource,
   getTree,
   eachRandomResource,
-  getCurrentDateTime
+  getCurrentDateTime,
+  filterExistDirs,
 }

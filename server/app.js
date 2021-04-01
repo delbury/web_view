@@ -25,7 +25,7 @@ const winattr = require('winattr');
 
 const ffmpeg = require('./modules/ffmpeg');
 const tools = require('./modules/tools'); // shuffle
-let {
+const {
   init,
   sources,
   saveFileStat
@@ -58,9 +58,12 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
 
 // 主体
 (async () => {
+  // 过滤文件夹列表
+  const filteredSourceDirs = await tools.filterExistDirs(SOURCE_DIRS, true);
+
   // 获取本地资源列表
   const localTrees = await init(
-    [...SOURCE_DIRS],
+    [...filteredSourceDirs],
     { hasInput: false, host: HOST, forceReload: process.argv.includes('-f') }
   );
   const trees = localTrees.length ? localTrees : sources;
@@ -138,7 +141,7 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
     .get('/play/:path/:sourceIndex', async ctx => {
       const sourceIndex = ctx.params.sourceIndex;
       const rspath = path.join(
-        SOURCE_DIRS[sourceIndex],
+        filteredSourceDirs[sourceIndex],
         decodeURIComponent(ctx.params.path)
       );
       
@@ -235,27 +238,28 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
     .get('/poster/:path/:sourceIndex', async ctx => {
       const rspath = decodeURIComponent(ctx.params.path); // 路由参数路径
       const sourceIndex = ctx.params.sourceIndex;
-      const fullpath = path.join(SOURCE_DIRS[sourceIndex], rspath); // 完整资源路径
+      const fullpath = path.join(filteredSourceDirs[sourceIndex], rspath); // 完整资源路径
       const dirname = path.dirname(fullpath); // 资源所在文件夹
+      const filename = path.basename(fullpath); // 文件名称
       const md5 = crypto.createHash('md5');
-      md5.update(rspath);
-      const name = md5.digest('hex'); // poster 名，不包括扩展名
+      md5.update(filename);
+      const md5Name = md5.digest('hex'); // poster 名，不包括扩展名
 
-      const posterPath = path.join(dirname, name + '.poster');
+      const posterPath = path.join(dirname, md5Name + '.poster');
       let errFlag = false;
       try {
         await fsAccess(posterPath);
       } catch (err) {
         try {
-          const res = await ffmpeg.getVideoSceenshots(fullpath, dirname, name);
+          const res = await ffmpeg.getVideoSceenshots(fullpath, dirname, md5Name);
           if (res) {
-            const posterPath = path.join(dirname, name + '_1.jpg'); // poster 完整路径名
-            const rePath = path.join(dirname, name + '.poster');
+            const posterPath = path.join(dirname, md5Name + '_1.jpg'); // poster 完整路径名
+            const rePath = path.join(dirname, md5Name + '.poster');
             await fsRename(posterPath, rePath);
             await new Promise(resolve => {
               winattr.set(rePath, { hidden: true }, () => resolve());
             });
-            saveFileStat(INFO_FILES_DIR, await fsStat(SOURCE_DIRS[sourceIndex]), sourceIndex); // 更新状态文件
+            saveFileStat(INFO_FILES_DIR, await fsStat(filteredSourceDirs[sourceIndex]), sourceIndex); // 更新状态文件
           }
         } catch (err) {
           errFlag = true;
@@ -317,13 +321,14 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
       await next();
     });
 
-  for (let key in SOURCE_DIRS) {
-    app.use(koaStatic(SOURCE_DIRS[key], {
+  for (let dir of filteredSourceDirs) {
+    app.use(koaStatic(dir, {
       setHeaders(res) {
         res.setHeader('Access-Control-Allow-Origin', '*')
       }
     }));
   }
+
   app
     .use(async (ctx, next) => {
       ctx.set('Access-Control-Allow-Origin', '*');
@@ -337,6 +342,3 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
   });
 })();
 
-module.exports = {
-  SOURCE_DIRS
-}
