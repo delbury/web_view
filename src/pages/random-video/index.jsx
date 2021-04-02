@@ -15,7 +15,7 @@ export default class RandomVideo extends React.Component {
   }
 
   // 切换视频
-  handleSwitch = async () => {
+  handleSwitch = async (cb) => {
     if(this.state.loading) return;
 
     if(this.state.videoList.length) {
@@ -24,7 +24,7 @@ export default class RandomVideo extends React.Component {
       this.setState({
         videoList: videoList,
         video,
-      });
+      }, () => cb && cb());
 
     } else {
       this.setState({ loading: true });
@@ -39,7 +39,7 @@ export default class RandomVideo extends React.Component {
           loading: false,
           videoList: list,
           video,
-        });
+        }, () => cb && cb());
       }
     }
   }
@@ -57,8 +57,8 @@ export default class RandomVideo extends React.Component {
   }
 
   // 前进
-  handleForwardMedia = () => {
-    this.handleSwitch();
+  handleForwardMedia = (cb) => {
+    this.handleSwitch(cb);
   }
 
   render() {
