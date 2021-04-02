@@ -25,6 +25,7 @@ class FolderPageImages extends Component {
         if(record.isIntersecting && !img.src) {
           img.src = img.dataset.src;
           img.style.visibility = 'visible';
+          io.unobserve(record.target);
         }
       }
     });
