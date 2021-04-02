@@ -17,6 +17,7 @@ const posterFileReg = /\.poster$/i;
 const videoFileReg = /(\.mp4)$/i;
 const videoExt = '.mp4';
 const posterExt = '.poster';
+const ignoreReg = /^ignore__.*/; // 过滤的文件名前缀
 
 main();
 
@@ -35,6 +36,9 @@ function main() {
 
 // 读取文件夹
 async function clearFile(dir, force = false) {
+  if(ignoreReg.test(path.basename(dir))) return; // 跳过忽略的文件夹
+
+  console.log('start cleaning dir: ', dir);
   const files = await fsReaddir(dir);
 
   if(!force) {
@@ -61,9 +65,9 @@ async function clearFile(dir, force = false) {
       await clearFile(fullPath, force);
     } else if(posterFileReg.test(item)) {
       // 是否是poster
-      console.log(fullPath)
       if(force || !existSet.has(item)) {
         fsUnlink(fullPath);
+        console.log('delete file: ', fullPath);
       }
     } else if(!force && videoFileReg.test(item)) {
       // 是否是video文件
