@@ -19,6 +19,7 @@ const fsRename = promisify(fs.rename);
 const fsAccess = promisify(fs.access);
 const fsStat = promisify(fs.stat);
 const fsWriteFile = promisify(fs.writeFile);
+const child_process = require('child_process');
 
 const crypto = require('crypto');
 const winattr = require('winattr');
@@ -154,14 +155,12 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
       try {
         res = await fsStat(rspath);
       } catch (err) {
-        console.log(false)
         ctx.status = 404;
         throw err;
       }
 
       // 获取 range 信息
       const range = ctx.headers.range;
-      // console.log(ctx.headers);
       if (range) {
         const positions = range.replace(/bytes=/, '').split('-');
 
@@ -184,7 +183,6 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
         }
 
         // 视频流
-        // console.log(start.toString().padStart(16, ' '), end.toString().padStart(16, ' '))
         const vs = fs.createReadStream(rspath, {
           start,
           end
@@ -212,10 +210,6 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
     // .get('/play/:path', async ctx => {
     //   const rspath = decodeURIComponent(ctx.params.path);
     //   const range = ctx.headers.range;
-
-    //   console.log('---------------------------------   ' + ctx.headers['x-playback-session-id']);
-    //   console.log(JSON.stringify(ctx.headers, null, 2));
-
     //   const positions = range.replace(/bytes=/, '').split('-');
     //   const file = await fsReadFile(path.join(SOURCE_DIR, rspath));
     //   const total = file.length;
@@ -229,10 +223,6 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
     //     // 'Keep-Alive': 'timeout=5, max=100'
     //   }
     //   ctx.set(headers);
-
-    //   console.log('***************    ');
-    //   console.log(JSON.stringify(headers, null, 2))
-    //   console.log('----------------------------------------')
     //   ctx.status = 206;
     //   ctx.body = file.slice(start, end + 1);
     // })
@@ -253,15 +243,42 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
         await fsAccess(posterPath);
       } catch (err) {
         try {
-          const res = await ffmpeg.getVideoSceenshots(fullpath, dirname, md5Name);
+          // 获取第一帧
+          // const res = await ffmpeg.getVideoSceenshots(fullpath, dirname, md5Name);
+          const posterPath = path.join(dirname, md5Name + '.jpg'); // poster 完整路径名
+          const rePath = path.join(dirname, md5Name + '.poster');
+          const res = await new Promise((resolve, reject) => {
+            child_process.exec(
+              [ 
+                'ffmpeg',
+                '-y',
+                '-ss', '1.0', '-i', `"${fullpath}"`,
+                '-vf', `scale=128:-1`,
+                '-frames:v', '1', '-q:v', '5', '-an',
+                `"${posterPath}"`,
+                '-hide_banner'
+              ].join(' '),
+              {},
+              (err, stdout, stderr) => {
+                if(err) {
+                  console.log('created ticks failed .');
+                  console.log(err);
+                  resolve(false);
+                } else {
+                  resolve(true);
+                }
+              }
+            );
+          });
+          console.log(res);
           if (res) {
-            const posterPath = path.join(dirname, md5Name + '_1.jpg'); // poster 完整路径名
-            const rePath = path.join(dirname, md5Name + '.poster');
             await fsRename(posterPath, rePath);
             await new Promise(resolve => {
               winattr.set(rePath, { hidden: true }, () => resolve());
             });
             saveFileStat(INFO_FILES_DIR, await fsStat(filteredSourceDirs[sourceIndex]), sourceIndex); // 更新状态文件
+          } else {
+            errFlag = true;
           }
         } catch (err) {
           errFlag = true;
