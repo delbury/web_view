@@ -3,14 +3,31 @@ import { Flex, Accordion, List, WhiteSpace } from 'antd-mobile';
 import { Icon } from 'antd';
 import { connect } from 'react-redux';
 import './style.scss';
-import { setSelectedImagesFolder } from '../../../store/action';
+import { setSelectedImagesFolder } from '@/store/action';
 import Video from '../components/video';
 import Audio from '../components/audio';
-import { openPdf } from '../../../api';
+import { openPdf } from '@/api';
+import { createIO } from '@/libs/util';
 
 const AccordionPanel = Accordion.Panel;
 const ListItem = List.Item;
 
+class Poster extends Component {
+  componentDidMount() {
+    this.props.io.observe(this.refs.imgbox);
+  }
+  render() {
+    return (
+      <div className="video-item-img" ref="imgbox">
+        <img
+          // src={this.props.src}
+          alt={this.props.alt}
+          data-src={this.props.src}
+        />
+      </div>
+    )
+  }
+}
 
 class ComputedAccordion extends Component {
   constructor() {
@@ -30,6 +47,7 @@ class ComputedAccordion extends Component {
       pdfs: [],
       // showPdf: false,
       // pdf: null
+      io: createIO(),
     };
   }
 
@@ -216,12 +234,11 @@ class ComputedAccordion extends Component {
                                         </div>
                                         <Icon type="play-circle" />
                                       </div>
-                                      <div className="video-item-img">
-                                        <img
-                                          src={window.API_BASE_URL + item.posterPath + `/${item.sourceIndex}`}
-                                          alt={item.alt}
-                                        />
-                                      </div>
+                                      <Poster 
+                                        alt={item.alt} 
+                                        src={window.API_BASE_URL + item.posterPath + `/${item.sourceIndex}`}
+                                        io={this.state.io}
+                                      ></Poster>
                                     </ListItem>
                                   ))
                                 }

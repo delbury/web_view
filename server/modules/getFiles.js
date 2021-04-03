@@ -9,10 +9,10 @@ const fsStat = promisify(fs.stat);
 const fsWriteFile = promisify(fs.writeFile);
 const fsAccess = promisify(fs.access);
 const fsReadFile = promisify(fs.readFile);
+const fsMkdir = promisify(fs.mkdir);
 const ignoreReg = /^ignore__.*/; // 过滤的文件名前缀
 let resourceBaseUrl = '';
 let rootPath = '';
-
 
 const sources = [];
 
@@ -22,6 +22,7 @@ const audioReg = /\.(mp3|ogg|wav)$/i;
 const pdfReg = /\.(pdf)$/i;
 const FILES_INFO_NAME = 'files_info';
 const FILES_STATS_NAME = 'files_stats';
+const INFOS_DIR = 'infos';
 
 const files_info_name_list = [];
 const files_stats_name_list = [];
@@ -154,9 +155,15 @@ async function refreshFilesInfo(url, index) {
 
 // 初始化
 async function init(urls, { hasInput = true, host = '/', forceReload = false } = { hasInput: true, host: '/' }) {
+  const infoDir = path.join(__dirname, INFOS_DIR);
+  try {
+    await fsAccess(infoDir);
+  } catch {
+    await fsMkdir(infoDir);
+  }
   for(let index in urls) {
-    files_info_name_list[index] = `${FILES_INFO_NAME}_${index}.json`;
-    files_stats_name_list[index] = `${FILES_STATS_NAME}_${index}.json`;
+    files_info_name_list[index] = `${INFOS_DIR}/${FILES_INFO_NAME}_${index}.json`;
+    files_stats_name_list[index] = `${INFOS_DIR}/${FILES_STATS_NAME}_${index}.json`;
     sources[index] = {
       dirsTree: {
         dirname: '',

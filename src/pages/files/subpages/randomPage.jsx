@@ -3,7 +3,8 @@ import { Grid, WhiteSpace, Flex } from 'antd-mobile';
 import { Icon } from 'antd';
 import Image from '../components/image'
 import ImagesView from '../components/imagesView';
-import { getRandomImages } from '../../../api';
+import { getRandomImages } from '@/api';
+import { createIO } from '@/libs/util';
 // import { consoleTest } from '../components/js/tool';
 
 
@@ -15,7 +16,7 @@ class RandomPageImages extends Component {
       index: 0,
       images: [],
       loading: false,
-      io: this.createIO(),
+      io: createIO(),
     };
     this.pageInfo = {
       pageSize: 10,
@@ -25,21 +26,7 @@ class RandomPageImages extends Component {
       totalItems: 0,
     }
   }
-  // 创建交叉监听
-  createIO() {
-    const io = new IntersectionObserver((records) => {
-      // 图片懒加载
-      for(const record of records) {
-        const img = record.target.querySelector('img');
-        if(record.isIntersecting && !img.src) {
-          img.src = img.dataset.src;
-          img.style.visibility = 'visible';
-          io.unobserve(record.target);
-        }
-      }
-    });
-    return io;
-  }
+
   handleImagesViewClick = (ev) => {
     this.setState({ showView: false });
     this.props.hammer && this.props.hammer.enable();

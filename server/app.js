@@ -270,7 +270,6 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
               }
             );
           });
-          console.log(res);
           if (res) {
             await fsRename(posterPath, rePath);
             await new Promise(resolve => {

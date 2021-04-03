@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Grid, WhiteSpace } from 'antd-mobile';
 import Image from '../components/image'
 import ImagesView from '../components/imagesView';
+import { createIO } from '@/libs/util';
 
 class FolderPageImages extends Component {
   constructor() {
@@ -11,25 +12,10 @@ class FolderPageImages extends Component {
       showView: false,
       index: 0,
       currentLen: 0,
-      io: this.createIO(),
+      io: createIO(),
     };
     this.len = 0;
     this.IMGS = [];
-  }
-  // 创建交叉监听
-  createIO() {
-    const io = new IntersectionObserver((records) => {
-      // 图片懒加载
-      for(const record of records) {
-        const img = record.target.querySelector('img');
-        if(record.isIntersecting && !img.src) {
-          img.src = img.dataset.src;
-          img.style.visibility = 'visible';
-          io.unobserve(record.target);
-        }
-      }
-    });
-    return io;
   }
   handleImagesViewClick = (ev) => {
     this.setState({ showView: false });

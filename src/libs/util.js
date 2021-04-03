@@ -38,3 +38,19 @@ export function timeToString(time) {
   const fn = num => num.toString().padStart(2, '0');
   return `${sym} ${fn(hours)}:${fn(minutes)}:${fn(seconds)}`;
 }
+
+// 创建交叉监听
+export function createIO() {
+  const io = new IntersectionObserver((records) => {
+    // 图片懒加载
+    for(const record of records) {
+      const img = record.target.querySelector('img');
+      if(record.isIntersecting && !img.src) {
+        img.src = img.dataset.src;
+        img.style.visibility = 'visible';
+        io.unobserve(record.target);
+      }
+    }
+  });
+  return io;
+}
