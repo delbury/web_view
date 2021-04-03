@@ -8,7 +8,7 @@ cd /d %Nginx_Dir%
 .\nginx.exe -s stop
 
 REM 关闭server
-pm2 delete all
+pm2 kill
 
 echo Service stopped.
 exit
