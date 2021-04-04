@@ -28,3 +28,4 @@ yarn-error.log*
 /server/modules/*.json
 /server/modules/*.log
 /server/pd
+/server/modules/infos

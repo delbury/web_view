@@ -10,7 +10,8 @@ start %Nginx_Dir%\nginx.exe || goto error_nginx_starting
 REM 删除原有的文件信息
 cd /d %~dp0
 cd %Stat_File_Dir%
-del .\%Stat_File_Name%
+@REM del .\%Stat_File_Name%
+rmdir /s /q .\%Stat_File_Name%
 
 REM REM 启动server
 cd /d %~dp0
