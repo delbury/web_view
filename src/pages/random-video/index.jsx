@@ -61,6 +61,11 @@ export default class RandomVideo extends React.Component {
     this.handleSwitch(cb);
   }
 
+  // 结束回调
+  handleVideoEnded = () => {
+    this.handleSwitch();
+  }
+
   render() {
     return (
       <div className="page-random">

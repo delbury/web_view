@@ -368,7 +368,7 @@ export default class PageVideos extends Component {
         >
           <video
             ref="video"
-            poster={window.API_BASE_URL + video.posterPath + `/${video.sourceIndex}`}
+            // poster={window.API_BASE_URL + video.posterPath + `/${video.sourceIndex}`}
             controls
             playsInline
             src={window.API_BASE_URL + video.sourcrPath + `/${video.sourceIndex}`}

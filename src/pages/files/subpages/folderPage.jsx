@@ -16,6 +16,7 @@ class FolderPageImages extends Component {
     };
     this.len = 0;
     this.IMGS = [];
+    this.theKey = 0;
   }
   handleImagesViewClick = (ev) => {
     this.setState({ showView: false });
@@ -75,10 +76,11 @@ class FolderPageImages extends Component {
 
   render() {
     const IMGS = this.IMGS.slice(0, this.state.currentLen);
+    this.theKey++;
     return (
       <div>
         <Grid
-          className="imagebox"
+          className="imagebox folder"
           data={IMGS}
           renderItem={(item, index) => 
             <Image
@@ -88,6 +90,7 @@ class FolderPageImages extends Component {
             />
           }
           columnNum={2}
+          key={this.theKey}
         >
         </Grid>
         {
