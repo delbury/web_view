@@ -134,6 +134,31 @@ export default class PageVideos extends Component {
     //     ev.preventDefault();
     //   }
     // })
+
+    document.addEventListener('keydown', ev => {
+      if(!this.props.video) return;
+
+      switch(ev.key) {
+        case 'ArrowLeft':
+          video.currentTime -= 10;
+          break;
+        case 'ArrowRight':
+          video.currentTime += 10;
+          break;
+        case 'ArrowUp':
+          if(!this.props.isFirst) {
+            this.props.onBackward();
+          }
+          break;
+        case 'ArrowDown':
+          if(!this.props.isLast) {
+            this.props.onForward();
+          }
+          break;
+        default: return;
+      }
+      ev.preventDefault();
+    });
   }
 
   // 旋转
