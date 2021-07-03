@@ -1,7 +1,8 @@
 set Nginx_Dir=G:\nginx-1.16.1
 REM set Nginx_Dir=F:\website\nginx-1.16.1
 set Server_Dir=..\server
-set Server_Main=.\app.js
+@REM set Server_Main=.\app.js
+set Server_Main=.\pm2.json
 set Stat_File_Dir=%Server_Dir%\modules
 @REM set Stat_File_Name=files_stats_*.json
 set Stat_File_Name=infos
