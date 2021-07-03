@@ -26,6 +26,6 @@ yarn-error.log*
 /public/test-sources/*
 /server/test-resources/*
 /server/modules/*.json
-/server/modules/*.log
+/server/**/*.log
 /server/pd
 /server/modules/infos
