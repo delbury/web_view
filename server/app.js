@@ -69,14 +69,6 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
   );
   const trees = localTrees.length ? localTrees : sources;
 
-  // if (trees) {
-  //   // dirsTree = trees[0].dirsTree || {};
-  //   // imageList = trees[0].imageList || [];
-  //   // videoList = trees[0].videoList || [];
-
-  //   imageList = [];
-  //   videoList = [];
-  // }
   let randomImages = tools.shuffle(Array.prototype.concat.apply([], trees.map(it => it.imageList)));
   let randomVideos = tools.shuffle(Array.prototype.concat.apply([], trees.map(it => it.videoList)));
   let randomAudios = tools.shuffle(Array.prototype.concat.apply([], trees.map(it => it.audioList)));
@@ -132,11 +124,9 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
     })
     // 文件结构
     .get('/tree', async ctx => {
-      // const { ids } = ctx.query;
       ctx.body = {
         code: 0,
         msg: 'successed',
-        // ...tools.getTree(dirsTree, ids)
         data: [...trees.map(it => it.dirsTree)]
       };
     })
@@ -207,25 +197,6 @@ async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
         });
       }
     })
-    // .get('/play/:path', async ctx => {
-    //   const rspath = decodeURIComponent(ctx.params.path);
-    //   const range = ctx.headers.range;
-    //   const positions = range.replace(/bytes=/, '').split('-');
-    //   const file = await fsReadFile(path.join(SOURCE_DIR, rspath));
-    //   const total = file.length;
-    //   const start = Number(positions[0]);
-    //   const end = Number(positions[1] || (total - 1))
-    //   const headers = {
-    //     'Content-Range': `bytes ${start}-${end}/${total}`,
-    //     'Accept-Ranges': 'bytes',
-    //     'Content-Length': end - start + 1,
-    //     'Content-Type': 'video/mp4',
-    //     // 'Keep-Alive': 'timeout=5, max=100'
-    //   }
-    //   ctx.set(headers);
-    //   ctx.status = 206;
-    //   ctx.body = file.slice(start, end + 1);
-    // })
     // 获取 poster
     .get('/poster/:path/:sourceIndex', async ctx => {
       const rspath = decodeURIComponent(ctx.params.path); // 路由参数路径
