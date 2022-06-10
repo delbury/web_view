@@ -1,9 +1,0 @@
-{
-  "apps": [
-    {
-      "script": "./app.js",
-      "exec_mode": "cluster_mode",
-      "instances": 6
-    }
-  ]
-}
