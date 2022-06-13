@@ -3,7 +3,6 @@ const path = require('path').posix;
 const child_process = require('child_process');
 
 const promisify = require('util').promisify;
-const fsWriteFile = promisify(fs.writeFile);
 const fsStat = promisify(fs.stat);
 const fsAccess = promisify(fs.access);
 const fsRename = promisify(fs.rename);
@@ -14,31 +13,9 @@ const winattr = require('winattr');
 
 const tools = require('./modules/tools'); // shuffle
 // const ffmpeg = require('./modules/ffmpeg');
-const {
-  saveFileStat
-} = require('./modules/getFiles');
-const {
-  INFO_FILES_DIR,
-  ERROR_LOG_FILE,
-} = require('./config');
-
-// 记录log
-async function recordLog(err, webError = false, path = ERROR_LOG_FILE) {
-  const date = tools.getCurrentDateTime();
-  try {
-    let log = '';
-    let place = webError ? 'WebError: ' : '';
-    if (err instanceof String) {
-      log = `${date} >>> ${err.code || ' --- '}: ${err.message || '-'}\r\n${err.info ? `${err.info}\r\n` : ''}`;
-    } else {
-      log = `${date} >>> ${err}\r\n`;
-    }
-    await fsWriteFile(path, place + log, { flag: 'a' });
-  } catch (err) {
-    throw err;
-  }
-};
-
+const { saveFileStat } = require('./modules/getFiles');
+const { INFO_FILES_DIR } = require('./config');
+const { recordLog } = require('./lib');
 
 // 创建路由
 const createRouter = ({

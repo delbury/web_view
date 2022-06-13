@@ -28,5 +28,5 @@ rm ${NGINX_TEMP_PATH}
 echo "nginx started successfully"
 
 # # 启动 server
-pm2 start ${SERVER_APP_PATH} -i 1
+pm2 start ${SERVER_APP_PATH}
 echo "server started successfully"

@@ -88,7 +88,7 @@
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js",
-    "server": "nodemon server/app.js"
+    "server": "nodemon server/app.js --i 2"
   },
   "eslintConfig": {
     "extends": "react-app",
