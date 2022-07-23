@@ -35,11 +35,14 @@ export default class PageVideos extends Component {
     // }
 
     // 可以播放
-    video.oncanplay = ev => {
+    video.onloadedmetadata = ev => {
       video.playbackRate = this.rateList[this.state.rateIndex];
       video.play();
-      // print('can play...');
     };
+    // video.oncanplay = ev => {
+    //   video.playbackRate = this.rateList[this.state.rateIndex];
+    //   video.play();
+    // };
 
     // 错误
     video.onerror = ev => {
@@ -266,6 +269,10 @@ export default class PageVideos extends Component {
         onTouchStart={ev => this.refreshTimer(this.refs.toolbar)}
       >
         <div ref="toolbar" className={`icon-box ${this.state.showCtrls ? '' : 'hidden'}`}>
+          <div className="info-header">
+            <div>{ video.parentDir }</div>
+            <div>{ video.alt }</div>
+          </div>
           <div className="row">
             <div className="left">
               <Icon

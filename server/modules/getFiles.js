@@ -63,7 +63,8 @@ async function getFiles(baseUrl, tree, index, parentId = null) {
           base: '/' + path.relative(resourceBaseUrl, fullName)
         }),
         alt: item,
-        sourceIndex: index
+        sourceIndex: index,
+        parentDir: path.basename(baseUrl),
       };
       if (imageReg.test(ext)) {
         // 图片
