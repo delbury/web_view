@@ -13,6 +13,11 @@ main();
 
 async function main() {
   if(cluster.isMaster || cluster.isPrimary) {
+    // 设置 fork 默认行为
+    (cluster.setupPrimary || cluster.setupMaster)({
+      windowsHide: true,
+    });
+
     const args = parseArgs(process.argv);
     // 创建初始化数据
     const initedData = await initData({
