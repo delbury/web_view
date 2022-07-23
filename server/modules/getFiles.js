@@ -179,11 +179,12 @@ async function init(urls, { hasInput = true, host = '/', forceReload = false } =
   }
   rootPath = host;
   const infos = [];
+
   for(let index in urls) {
     const url = urls[index];
-
     let needReloadFiles = false; // 是否需要重新加载文件夹信息
 
+    forceReload && console.log('force reloading...')
     if(!forceReload) {
       // 判断文件是否被修改
       try {

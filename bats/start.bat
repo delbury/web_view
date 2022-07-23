@@ -11,7 +11,7 @@ REM 启动server
 cd /d %~dp0
 cd %Server_Dir% || goto error_server_dir
 
-pm2 start %Server_Main% -i 1 || goto error_server_starting
+pm2 start %Server_Main% || goto error_server_starting
 
 echo Service started.
 exit

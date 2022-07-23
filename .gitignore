@@ -29,3 +29,5 @@ yarn-error.log*
 /server/**/*.log
 /server/pd
 /server/modules/infos
+
+nginx/temp.conf
