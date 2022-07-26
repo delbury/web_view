@@ -10,27 +10,34 @@ const fsStat = promisify(fs.stat);
 const { cloneDeep } = require('lodash');
 // const fsAccess = promisify(fs.access);
 const fileReg = /\.(avi|mkv|rm|rmvb|3gp|mov|flv|ts|wmv|zip|rar|7z)/i;
-// const ROOT_DIR = 'F:/资源'; // path.resolve(__dirname, '../pd').replace(/\\/g, '/');
-const ROOT_DIR = 'G:/BaiduNetdiskDownload'
+
+const ROOT_DIRS = ['G:/BaiduNetdiskDownload', 'F:/资源/pd', 'E:/game/others']
 const TREE_NODE = {
   children: null,
   matchedFiles: null,
   dirPath: '',
   baseName: ''
 };
-const fileTreeRoot = cloneDeep(TREE_NODE);
+const fileTreeRoots = [];
 const matchedFileList = [];
 
 main();
 
 async function main() {
-  try {
-    fs.accessSync(ROOT_DIR);
-    await readFile(ROOT_DIR, fileTreeRoot);
+  for(const ROOT_DIR of ROOT_DIRS) {
+    try {
+      fs.accessSync(ROOT_DIR);
+
+      const fileTreeRoot = cloneDeep(TREE_NODE);
+      fileTreeRoots.push(fileTreeRoot);
+
+      await readFile(ROOT_DIR, fileTreeRoot);
+      
+      // console.log(JSON.stringify(matchedFileList, null, 2));
+    } catch (err) {
+      console.log(err)
+    }
     analyseResult();
-    // console.log(JSON.stringify(matchedFileList, null, 2));
-  } catch (err) {
-    console.log(err)
   }
 }
 
