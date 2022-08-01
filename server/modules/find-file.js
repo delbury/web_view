@@ -11,7 +11,7 @@ const { cloneDeep } = require('lodash');
 // const fsAccess = promisify(fs.access);
 const fileReg = /\.(avi|mkv|rm|rmvb|3gp|mov|flv|ts|wmv|zip|rar|7z)/i;
 
-const ROOT_DIRS = ['G:/BaiduNetdiskDownload', 'F:/资源/pd', 'E:/game/others']
+const ROOT_DIRS = ['G:/BaiduNetdiskDownload', 'F:/资源/pd', 'E:/game/others', 'D:/games/others']
 const TREE_NODE = {
   children: null,
   matchedFiles: null,

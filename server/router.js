@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path').posix;
 const child_process = require('child_process');
+const crypto = require('crypto');
 
 const promisify = require('util').promisify;
 const fsStat = promisify(fs.stat);
