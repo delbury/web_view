@@ -5,7 +5,16 @@ const INFO_FILES_DIR = path.join(__dirname, './modules');
 
 // 文件服务器
 // 全部静态文件夹
-const SOURCE_DIRS = ['F:/资源/pd', 'G:/BaiduNetdiskDownload', 'E:/game/others', 'D:/games/others', '/Users/bytedance/Movies'];
+const SOURCE_DIRS = [
+  'D:/enjoy/others/one',
+  'D:/enjoy/others/two',
+  'D:/enjoy/others/three',
+  'D:/enjoy/others/comic',
+  'D:/enjoy/others/bts',
+  'D:/enjoy/others/ai',
+  'D:/enjoy/others/shared',
+  'D:/enjoy/others/tele',
+];
 
 const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
 const ERROR_LOG_FILE = path.join(__dirname, './error.log');

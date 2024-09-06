@@ -1,5 +1,5 @@
-set Nginx_Dir=G:\nginx-1.16.1
-REM set Nginx_Dir=F:\website\nginx-1.16.1
+set Nginx_Dir=D:\codespace\nginx-1.25.0
+REM set Nginx_Dir=E:\workspace\nginx-1.25.0
 set Server_Dir=..\server
 @REM set Server_Main=.\app.js
 set Server_Main=.\app.js

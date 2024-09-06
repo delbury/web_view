@@ -131,6 +131,10 @@ export default class PageVideos extends Component {
       paused: video.paused
     });
 
+    video.onfocus = ev => {
+      video.blur();
+    }
+
     // this.refs.mediabox.addEventListener('touchmove', ev => {
     //   if(ev.target !== video) {
     //     ev.stopPropagation();
@@ -140,7 +144,7 @@ export default class PageVideos extends Component {
 
     document.addEventListener('keydown', ev => {
       if(!this.props.video) return;
-
+      ev.preventDefault();
       switch(ev.key) {
         case 'ArrowLeft':
           video.currentTime -= 10;
@@ -160,7 +164,6 @@ export default class PageVideos extends Component {
           break;
         default: return;
       }
-      ev.preventDefault();
     });
   }
 
@@ -392,8 +395,10 @@ export default class PageVideos extends Component {
           ref="videoContainer"
           style={{
             transform: `rotate(${rotate}deg)`,
-            width,
-            height,
+            textAlign: 'center',
+            display: 'flex',
+            width: `calc(100${rotate % 180 === 0 ? 'vw' : 'vh'} - 2em)`,
+            height: `calc(100${rotate % 180 === 0 ? 'vh' : 'vw'} - 2em)`,
             maxWidth,
             maxHeight,
           }}
@@ -407,10 +412,11 @@ export default class PageVideos extends Component {
             type="video/mp4"
             preload="metadata"
             style={{
+              flex: 1,
               width,
               height,
-              maxWidth,
-              maxHeight
+              // maxWidth,
+              // maxHeight
             }}
           ></video>
         </div>
