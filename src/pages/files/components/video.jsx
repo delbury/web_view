@@ -144,23 +144,35 @@ export default class PageVideos extends Component {
 
     document.addEventListener('keydown', ev => {
       if(!this.props.video) return;
-      ev.preventDefault();
+      console.log(ev.key)
       switch(ev.key) {
         case 'ArrowLeft':
+          ev.preventDefault();
           video.currentTime -= 10;
           break;
         case 'ArrowRight':
+          ev.preventDefault();
           video.currentTime += 10;
           break;
         case 'ArrowUp':
+          ev.preventDefault();
           if(!this.props.isFirst) {
             this.props.onBackward();
           }
           break;
         case 'ArrowDown':
+          ev.preventDefault();
           if(!this.props.isLast) {
             this.props.onForward();
           }
+          break;
+        case '1':
+          this.onRotate(-90);
+          break;
+        case '2':
+          break;
+        case '3':
+          this.onRotate(90);
           break;
         default: return;
       }
