@@ -14,6 +14,7 @@ const SOURCE_DIRS = [
   'D:/enjoy/others/ai',
   'D:/enjoy/others/shared',
   'D:/enjoy/others/tele',
+  'D:/enjoy/others/fenlei',
 ];
 
 const excludeErrorCodes = ['ECONNRESET', 'ECONNABORTED'];
